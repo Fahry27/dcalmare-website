@@ -38,13 +38,13 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-7 md:flex">
           {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-sm font-medium text-muted transition hover:text-burgundy"
-            >
-              {item.label}
-            </Link>
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-medium text-muted transition hover:text-burgundy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite"
+              >
+                {item.label}
+              </Link>
           ))}
         </div>
 

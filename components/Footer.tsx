@@ -18,16 +18,16 @@ export default function Footer() {
             Explore
           </h2>
           <div className="mt-4 grid gap-3 text-sm text-offwhite/75">
-            <Link href="/shop" className="flex min-h-11 items-center transition hover:text-white">
+            <Link href="/shop" className="flex min-h-11 items-center transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-burgundy-dark">
               Shop
             </Link>
-            <Link href="/about" className="flex min-h-11 items-center transition hover:text-white">
+            <Link href="/about" className="flex min-h-11 items-center transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-burgundy-dark">
               About
             </Link>
-            <Link href="/size-guide" className="flex min-h-11 items-center transition hover:text-white">
+            <Link href="/size-guide" className="flex min-h-11 items-center transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-burgundy-dark">
               Size Guide
             </Link>
-            <Link href="/faq" className="flex min-h-11 items-center transition hover:text-white">
+            <Link href="/faq" className="flex min-h-11 items-center transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-burgundy-dark">
               FAQ
             </Link>
           </div>

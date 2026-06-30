@@ -30,20 +30,24 @@ export default function FAQSection({ limit, showLink = false }: FAQSectionProps)
             </Link>
           ) : null}
         </div>
-        <div className="mt-8 grid min-w-0 gap-4 md:mt-10">
-          {visibleFaqs.map((faq) => (
-            <details key={faq.question} className="group min-w-0 border border-burgundy/12 bg-white p-4 sm:p-5">
-              <summary className="cursor-pointer list-none text-base font-semibold text-ink">
-                <span className="inline-flex min-h-11 w-full min-w-0 items-center justify-between gap-4">
-                  <span className="min-w-0 break-words">{faq.question}</span>
-                  <span className="shrink-0 text-burgundy transition group-open:rotate-45">+</span>
-                </span>
-              </summary>
-              <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted md:text-sm md:leading-7">
-                {faq.answer}
-              </p>
-            </details>
-          ))}
+        <div className="mt-8 grid min-w-0 md:mt-10">
+          <div className="border-t border-burgundy/20">
+            {visibleFaqs.map((faq) => (
+              <details key={faq.question} className="group min-w-0 border-b border-burgundy/20 py-4 sm:py-6">
+                <summary className="cursor-pointer list-none text-base font-semibold text-ink outline-none transition-colors hover:text-burgundy focus-visible:text-burgundy">
+                  <span className="inline-flex min-h-8 w-full min-w-0 items-center justify-between gap-4">
+                    <span className="min-w-0 break-words">{faq.question}</span>
+                    <span className="shrink-0 text-xl font-light text-burgundy transition-transform duration-300 group-open:rotate-45">+</span>
+                  </span>
+                </summary>
+                <div className="overflow-hidden">
+                  <p className="mt-4 max-w-3xl pr-8 text-base leading-relaxed text-muted md:text-sm md:leading-7">
+                    {faq.answer}
+                  </p>
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -318,7 +318,7 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
                 type="button"
                 disabled={!isFormComplete}
                 onClick={confirmPayment}
-                className="min-h-14 w-full bg-burgundy px-4 py-3 text-center text-sm font-semibold uppercase leading-5 tracking-[0.04em] text-white transition hover:bg-burgundy-dark disabled:cursor-not-allowed disabled:bg-muted/35 disabled:text-white sm:px-6 sm:tracking-[0.14em]"
+                className="min-h-14 w-full bg-burgundy px-4 py-3 text-center text-sm font-semibold uppercase leading-5 tracking-[0.04em] text-white transition hover:bg-burgundy-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:bg-muted/35 disabled:text-white sm:px-6 sm:tracking-[0.14em]"
               >
                 Saya Sudah Bayar — Konfirmasi ke WhatsApp
               </button>
@@ -326,7 +326,7 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
 
             <div className="mt-6 text-center text-xs text-muted">
               <p>Manual payment verification by dCalmare team.</p>
-              <p className="mt-1">Please prepare payment proof before confirming through WhatsApp.</p>
+              <p className="mt-1">Setelah klik tombol ini, kirim bukti pembayaran melalui WhatsApp.</p>
             </div>
           </div>
         </div>

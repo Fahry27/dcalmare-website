@@ -46,7 +46,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="mt-2 text-sm font-semibold text-muted">
           {formatRupiah(product.price)}
         </p>
-        <span className="mt-6 inline-flex min-h-11 w-full items-center justify-center border border-burgundy px-5 text-sm font-semibold uppercase tracking-[0.12em] text-burgundy transition group-hover:bg-burgundy group-hover:text-white sm:tracking-[0.16em]">
+        <span className="mt-6 inline-flex min-h-11 w-full items-center justify-center border border-burgundy px-5 text-sm font-semibold uppercase tracking-[0.12em] text-burgundy transition group-hover:bg-burgundy group-hover:text-white group-focus-visible:outline-none group-focus-visible:ring-2 group-focus-visible:ring-burgundy group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-white sm:tracking-[0.16em]">
           View Details
         </span>
       </div>

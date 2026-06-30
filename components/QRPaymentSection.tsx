@@ -29,7 +29,7 @@ export default function QRPaymentSection() {
             <li>Click “Saya Sudah Bayar — Konfirmasi ke WhatsApp”.</li>
           </ol>
           <p className="mt-5 break-words border border-burgundy/15 bg-cream px-4 py-3 text-sm font-semibold leading-relaxed text-burgundy">
-            Please complete payment before clicking the confirmation button.
+            Pastikan nominal pembayaran sesuai total pesanan. Please complete payment before clicking the confirmation button.
           </p>
           <p className="mt-4 text-sm leading-relaxed text-muted md:leading-6">
             Setelah pembayaran berhasil, klik tombol konfirmasi untuk mengirim

@@ -47,7 +47,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     <>
       <section className="bg-offwhite py-8 md:py-16">
         <div className="container-pad">
-          <Link href="/shop" className="inline-flex min-h-11 items-center text-sm font-semibold text-burgundy">
+          <Link href="/shop" className="inline-flex min-h-11 items-center text-sm font-semibold text-burgundy transition hover:text-burgundy-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite">
             Back to shop
           </Link>
 
@@ -116,6 +116,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   <dd className="break-words text-right text-muted">{product.color}</dd>
                 </div>
               </dl>
+              <p className="mt-4 text-xs italic text-muted">
+                Oversized fit. Check size guide before ordering.
+              </p>
 
               <div className="mt-8">
                 <div className="flex items-center justify-between gap-4">
@@ -186,7 +189,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <button
                 type="button"
                 onClick={continueToCheckout}
-                className="mt-8 flex min-h-14 w-full items-center justify-center bg-burgundy px-4 text-center text-sm font-semibold uppercase leading-5 tracking-[0.08em] text-white transition hover:bg-burgundy-dark sm:px-6 sm:tracking-[0.18em]"
+                className="mt-8 flex min-h-14 w-full items-center justify-center bg-burgundy px-4 text-center text-sm font-semibold uppercase leading-5 tracking-[0.08em] text-white transition hover:bg-burgundy-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite sm:px-6 sm:tracking-[0.18em]"
               >
                 Continue to Checkout
               </button>
