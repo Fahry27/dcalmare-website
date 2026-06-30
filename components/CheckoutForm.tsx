@@ -51,17 +51,17 @@ function CheckoutErrorState({
   return (
     <section className="bg-offwhite py-16 md:py-24">
       <div className="container-pad">
-        <div className="mx-auto max-w-2xl border border-burgundy/12 bg-white p-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-burgundy">
+        <div className="mx-auto max-w-2xl border border-burgundy/12 bg-white p-5 text-center sm:p-8">
+          <p className="break-words text-xs font-semibold uppercase tracking-[0.16em] text-burgundy sm:tracking-[0.22em]">
             Checkout unavailable
           </p>
-          <h1 className="mt-4 font-serif text-4xl font-semibold text-ink">
+          <h1 className="mt-4 break-words font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl">
             {title}
           </h1>
-          <p className="mt-4 text-sm leading-6 text-muted">{message}</p>
+          <p className="mt-4 text-base leading-relaxed text-muted">{message}</p>
           <Link
             href="/shop"
-            className="mt-7 inline-flex min-h-12 items-center justify-center bg-burgundy px-6 text-sm font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-burgundy-dark"
+            className="mt-7 inline-flex min-h-12 w-full items-center justify-center bg-burgundy px-5 text-center text-sm font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-burgundy-dark sm:w-auto sm:px-6 sm:tracking-[0.16em]"
           >
             Back to shop
           </Link>
@@ -185,55 +185,55 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
   }
 
   return (
-    <section className="bg-offwhite py-10 md:py-16">
+    <section className="bg-offwhite py-8 md:py-16">
       <div className="container-pad">
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-burgundy">
+        <div className="max-w-3xl min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-burgundy sm:tracking-[0.24em]">
             Checkout
           </p>
-          <h1 className="mt-4 font-serif text-5xl font-semibold text-ink md:text-6xl">
+          <h1 className="mt-4 break-words font-serif text-4xl font-semibold leading-tight text-ink sm:text-5xl md:text-6xl">
             Complete your order.
           </h1>
-          <p className="mt-5 text-base leading-8 text-muted">
+          <p className="mt-5 text-base leading-relaxed text-muted md:leading-8">
             Fill your delivery details, scan the GoPay Merchant QR, then confirm
             the paid order to dCalmare admin via WhatsApp.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
-          <aside className="border border-burgundy/12 bg-white p-5 md:p-7 lg:sticky lg:top-28">
-            <h2 className="font-serif text-3xl font-semibold text-ink">
+        <div className="mt-8 grid min-w-0 gap-6 lg:mt-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+          <aside className="min-w-0 border border-burgundy/12 bg-white p-4 sm:p-5 md:p-7 lg:sticky lg:top-28">
+            <h2 className="break-words font-serif text-3xl font-semibold leading-tight text-ink">
               Order summary
             </h2>
             <dl className="mt-6 grid gap-4 text-sm">
-              <div className="flex justify-between gap-6">
+              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
                 <dt className="text-muted">Product name</dt>
-                <dd className="text-right font-semibold text-ink">{product.name}</dd>
+                <dd className="break-words text-right font-semibold text-ink">{product.name}</dd>
               </div>
-              <div className="flex justify-between gap-6">
+              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
                 <dt className="text-muted">Size</dt>
-                <dd className="font-semibold text-ink">{selectedSize}</dd>
+                <dd className="text-right font-semibold text-ink">{selectedSize}</dd>
               </div>
-              <div className="flex justify-between gap-6">
+              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
                 <dt className="text-muted">Quantity</dt>
-                <dd className="font-semibold text-ink">{quantity}</dd>
+                <dd className="text-right font-semibold text-ink">{quantity}</dd>
               </div>
-              <div className="flex justify-between gap-6">
+              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
                 <dt className="text-muted">Unit price</dt>
-                <dd className="font-semibold text-ink">
+                <dd className="text-right font-semibold text-ink">
                   {formatRupiah(product.price)}
                 </dd>
               </div>
-              <div className="flex justify-between gap-6 border-t border-burgundy/10 pt-4 text-base">
+              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4 border-t border-burgundy/10 pt-4 text-base">
                 <dt className="font-semibold text-ink">Total</dt>
-                <dd className="font-semibold text-burgundy">{formatRupiah(total)}</dd>
+                <dd className="text-right font-semibold text-burgundy">{formatRupiah(total)}</dd>
               </div>
             </dl>
           </aside>
 
-          <div className="grid gap-6">
-            <form className="border border-burgundy/12 bg-white p-5 md:p-7">
-              <h2 className="font-serif text-3xl font-semibold text-ink">
+          <div className="grid min-w-0 gap-6">
+            <form className="min-w-0 border border-burgundy/12 bg-white p-4 sm:p-5 md:p-7">
+              <h2 className="break-words font-serif text-3xl font-semibold leading-tight text-ink">
                 Delivery details
               </h2>
               <div className="mt-6 grid gap-5">
@@ -243,7 +243,7 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
                     type="text"
                     value={fields.fullName}
                     onChange={(event) => updateField("fullName", event.target.value)}
-                    className="min-h-12 border border-burgundy/15 bg-offwhite px-4 text-sm font-normal outline-none transition focus:border-burgundy"
+                    className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
                     autoComplete="name"
                     required
                   />
@@ -254,7 +254,7 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
                     type="tel"
                     value={fields.whatsapp}
                     onChange={(event) => updateField("whatsapp", event.target.value)}
-                    className="min-h-12 border border-burgundy/15 bg-offwhite px-4 text-sm font-normal outline-none transition focus:border-burgundy"
+                    className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
                     autoComplete="tel"
                     required
                   />
@@ -264,7 +264,7 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
                   <textarea
                     value={fields.address}
                     onChange={(event) => updateField("address", event.target.value)}
-                    className="min-h-28 resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-sm font-normal outline-none transition focus:border-burgundy"
+                    className="min-h-28 w-full resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
                     required
                   />
                 </label>
@@ -277,7 +277,7 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
                       onChange={(event) =>
                         updateField("cityDistrict", event.target.value)
                       }
-                      className="min-h-12 border border-burgundy/15 bg-offwhite px-4 text-sm font-normal outline-none transition focus:border-burgundy"
+                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
                       required
                     />
                   </label>
@@ -289,7 +289,7 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
                       onChange={(event) =>
                         updateField("postalCode", event.target.value)
                       }
-                      className="min-h-12 border border-burgundy/15 bg-offwhite px-4 text-sm font-normal outline-none transition focus:border-burgundy"
+                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
                       autoComplete="postal-code"
                       required
                     />
@@ -300,7 +300,7 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
                   <textarea
                     value={fields.notes}
                     onChange={(event) => updateField("notes", event.target.value)}
-                    className="min-h-24 resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-sm font-normal outline-none transition focus:border-burgundy"
+                    className="min-h-24 w-full resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
                   />
                 </label>
               </div>
@@ -308,14 +308,26 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
 
             <QRPaymentSection />
 
-            <button
-              type="button"
-              disabled={!isFormComplete}
-              onClick={confirmPayment}
-              className="min-h-14 bg-burgundy px-6 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-burgundy-dark disabled:cursor-not-allowed disabled:bg-muted/35 disabled:text-white"
-            >
-              Saya Sudah Bayar — Konfirmasi ke WhatsApp
-            </button>
+            <div className="grid gap-3">
+              {!isFormComplete ? (
+                <p className="text-center text-sm font-medium text-burgundy">
+                  Please fill all required delivery details to continue.
+                </p>
+              ) : null}
+              <button
+                type="button"
+                disabled={!isFormComplete}
+                onClick={confirmPayment}
+                className="min-h-14 w-full bg-burgundy px-4 py-3 text-center text-sm font-semibold uppercase leading-5 tracking-[0.04em] text-white transition hover:bg-burgundy-dark disabled:cursor-not-allowed disabled:bg-muted/35 disabled:text-white sm:px-6 sm:tracking-[0.14em]"
+              >
+                Saya Sudah Bayar — Konfirmasi ke WhatsApp
+              </button>
+            </div>
+
+            <div className="mt-6 text-center text-xs text-muted">
+              <p>Manual payment verification by dCalmare team.</p>
+              <p className="mt-1">Please prepare payment proof before confirming through WhatsApp.</p>
+            </div>
           </div>
         </div>
       </div>

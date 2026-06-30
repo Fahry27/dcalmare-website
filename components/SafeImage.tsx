@@ -22,7 +22,7 @@ export default function SafeImage({
     return (
       <div
         className={cn(
-          "flex h-full w-full items-center justify-center bg-cream px-6 text-center text-sm font-medium uppercase tracking-[0.16em] text-burgundy",
+          "flex h-full w-full items-center justify-center break-words bg-cream px-4 text-center text-sm font-medium uppercase tracking-[0.12em] text-burgundy sm:px-6 sm:tracking-[0.16em]",
           fallbackClassName
         )}
         role="img"

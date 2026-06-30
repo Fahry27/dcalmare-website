@@ -7,16 +7,16 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <section className="bg-offwhite py-16 md:py-24">
-      <div className="container-pad grid gap-10 md:grid-cols-[0.75fr_1.25fr]">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-burgundy">
+    <section className="bg-offwhite py-12 md:py-24">
+      <div className="container-pad grid min-w-0 gap-8 md:grid-cols-[0.75fr_1.25fr] md:gap-10">
+        <p className="break-words text-xs font-semibold uppercase tracking-[0.18em] text-burgundy sm:tracking-[0.24em]">
           About dCalmare
         </p>
-        <div>
-          <h1 className="font-serif text-5xl font-semibold leading-tight text-ink md:text-6xl">
+        <div className="min-w-0">
+          <h1 className="break-words font-serif text-4xl font-semibold leading-tight text-ink sm:text-5xl md:text-6xl">
             One summer can change everything.
           </h1>
-          <div className="mt-8 grid gap-5 text-base leading-8 text-muted">
+          <div className="mt-7 grid gap-5 text-base leading-relaxed text-muted md:mt-8 md:leading-8">
             <p>
               dCalmare combines the founder&apos;s initial, D, with the Italian
               word &quot;calmare&quot; — meaning to calm.
@@ -30,7 +30,7 @@ export default function AboutPage() {
               thoughtful words, dCalmare creates pieces that remind people to
               enjoy the present.
             </p>
-            <p className="font-serif text-3xl font-semibold leading-tight text-burgundy">
+            <p className="break-words font-serif text-3xl font-semibold leading-tight text-burgundy">
               One summer can change everything.
             </p>
           </div>

@@ -18,16 +18,22 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "dCalmare | Summer-Inspired Graphic Tees",
+    default: "dCalmare | One summer can change everything.",
     template: "%s | dCalmare"
   },
   description:
-    "Premium local fashion brand creating summer-inspired oversized white graphic tees with nostalgic words and calm luxury streetwear energy.",
+    "Summer-inspired graphic tees made to remind you to slow down, feel present, and wear the moment.",
   metadataBase: new URL("https://dcalmare.local"),
   openGraph: {
-    title: "dCalmare",
-    description: "One summer can change everything.",
-    type: "website"
+    title: "dCalmare | One summer can change everything.",
+    description: "Summer-inspired graphic tees made to remind you to slow down, feel present, and wear the moment.",
+    type: "website",
+    siteName: "dCalmare"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "dCalmare | One summer can change everything.",
+    description: "Summer-inspired graphic tees made to remind you to slow down, feel present, and wear the moment."
   }
 };
 

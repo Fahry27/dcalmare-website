@@ -29,6 +29,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
@@ -36,6 +37,7 @@ body {
   background: var(--off-white);
   color: var(--near-black);
   font-family: var(--font-inter), Arial, sans-serif;
+  overflow-x: clip;
 }
 
 body::selection {
@@ -52,10 +54,22 @@ button,
 input,
 textarea {
   font: inherit;
+  max-width: 100%;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+main {
+  overflow-x: clip;
 }
 
 .container-pad {
-  width: min(100%, 1180px);
+  width: 100%;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 0 1rem;
 }

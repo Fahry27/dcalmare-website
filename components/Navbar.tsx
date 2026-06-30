@@ -18,20 +18,20 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-burgundy/10 bg-offwhite/95 backdrop-blur">
-      <nav className="container-pad flex min-h-20 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-3" aria-label="dCalmare home">
-          <div className="relative h-11 w-11 overflow-hidden rounded-full border border-burgundy/15 bg-cream">
+      <nav className="container-pad flex min-h-16 items-center justify-between gap-3 md:min-h-20 md:gap-4">
+        <Link href="/" className="flex min-h-11 min-w-0 items-center gap-2.5 md:gap-3" aria-label="dCalmare home">
+          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-burgundy/15 bg-cream md:h-11 md:w-11">
             <SafeImage
               src="/brand/dcalmare-logo.jpg"
               alt="dCalmare logo"
               fill
-              sizes="44px"
+              sizes="(min-width: 768px) 44px, 36px"
               className="object-cover"
               fallbackLabel="dC"
               fallbackClassName="text-xs tracking-normal"
             />
           </div>
-          <span className="font-serif text-2xl font-semibold text-burgundy">
+          <span className="truncate font-serif text-xl font-semibold text-burgundy md:text-2xl">
             dCalmare
           </span>
         </Link>
@@ -50,7 +50,7 @@ export default function Navbar() {
 
         <button
           type="button"
-          className="inline-flex h-11 w-11 items-center justify-center border border-burgundy/20 text-burgundy md:hidden"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-burgundy/20 text-burgundy md:hidden"
           onClick={() => setIsOpen((value) => !value)}
           aria-label="Toggle navigation menu"
           aria-expanded={isOpen}
@@ -64,14 +64,19 @@ export default function Navbar() {
         </button>
       </nav>
 
-      {isOpen ? (
-        <div className="border-t border-burgundy/10 bg-offwhite md:hidden">
+      <div
+        className={cn(
+          "grid transition-all duration-300 ease-in-out md:hidden",
+          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        )}
+      >
+        <div className="overflow-hidden border-t border-burgundy/10 bg-offwhite">
           <div className="container-pad grid gap-1 py-4">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="py-3 text-base font-medium text-ink"
+                className="flex min-h-12 items-center py-2 text-base font-medium text-ink transition hover:text-burgundy active:scale-[0.98]"
                 onClick={() => setIsOpen(false)}
               >
                 {item.label}
@@ -79,7 +84,7 @@ export default function Navbar() {
             ))}
           </div>
         </div>
-      ) : null}
+      </div>
     </header>
   );
 }

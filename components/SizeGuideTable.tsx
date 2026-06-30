@@ -7,29 +7,34 @@ const sizes = [
 
 export default function SizeGuideTable() {
   return (
-    <div className="overflow-x-auto border border-burgundy/12 bg-white">
-      <table className="w-full min-w-[640px] border-collapse text-left text-sm">
-        <thead className="bg-cream text-burgundy">
-          <tr>
-            <th className="px-5 py-4 font-semibold">Size</th>
-            <th className="px-5 py-4 font-semibold">Chest Width</th>
-            <th className="px-5 py-4 font-semibold">Length</th>
-            <th className="px-5 py-4 font-semibold">Shoulder</th>
-            <th className="px-5 py-4 font-semibold">Sleeve</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sizes.map((row) => (
-            <tr key={row.size} className="border-t border-burgundy/10">
-              <td className="px-5 py-4 font-semibold text-ink">{row.size}</td>
-              <td className="px-5 py-4 text-muted">{row.chest}</td>
-              <td className="px-5 py-4 text-muted">{row.length}</td>
-              <td className="px-5 py-4 text-muted">{row.shoulder}</td>
-              <td className="px-5 py-4 text-muted">{row.sleeve}</td>
+    <>
+      <div className="max-w-full overflow-x-auto border border-burgundy/12 bg-white [-webkit-overflow-scrolling:touch]">
+        <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+          <thead className="bg-cream text-burgundy">
+            <tr>
+              <th className="px-5 py-4 font-semibold">Size</th>
+              <th className="px-5 py-4 font-semibold">Chest Width</th>
+              <th className="px-5 py-4 font-semibold">Length</th>
+              <th className="px-5 py-4 font-semibold">Shoulder</th>
+              <th className="px-5 py-4 font-semibold">Sleeve</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {sizes.map((row) => (
+              <tr key={row.size} className="border-t border-burgundy/10">
+                <td className="px-5 py-4 font-semibold text-ink">{row.size}</td>
+                <td className="px-5 py-4 text-muted">{row.chest}</td>
+                <td className="px-5 py-4 text-muted">{row.length}</td>
+                <td className="px-5 py-4 text-muted">{row.shoulder}</td>
+                <td className="px-5 py-4 text-muted">{row.sleeve}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-sm text-muted md:hidden">
+        Geser tabel untuk melihat ukuran lengkap.
+      </p>
+    </>
   );
 }
