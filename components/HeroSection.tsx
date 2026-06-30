@@ -21,7 +21,7 @@ export default function HeroSection() {
           </p>
           <Link
             href="/shop"
-            className="mt-8 inline-flex min-h-12 w-full items-center justify-center bg-offwhite px-5 text-center text-sm font-semibold uppercase tracking-[0.1em] text-burgundy transition hover:bg-white hover:text-burgundy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-burgundy sm:w-auto sm:px-7 sm:tracking-[0.18em]"
+            className="mt-8 inline-flex min-h-12 w-full items-center justify-center bg-offwhite px-5 text-center text-sm font-semibold uppercase tracking-[0.1em] text-[#5a0010] transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-burgundy sm:w-auto sm:px-7 sm:tracking-[0.18em]"
           >
             Shop The First Drop
           </Link>
