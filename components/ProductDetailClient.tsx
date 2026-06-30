@@ -48,7 +48,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       <section className="bg-offwhite py-8 md:py-16">
         <div className="container-pad">
           <Link href="/shop" className="inline-flex min-h-11 items-center text-sm font-semibold text-burgundy transition hover:text-burgundy-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite">
-            Back to shop
+            Kembali ke katalog
           </Link>
 
           <div className="mt-6 grid min-w-0 gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-start">
@@ -117,14 +117,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 </div>
               </dl>
               <p className="mt-4 text-xs italic text-muted">
-                Oversized fit. Check size guide before ordering.
+                Oversized fit. Cek panduan ukuran sebelum memesan.
               </p>
 
               <div className="mt-8">
                 <div className="flex items-center justify-between gap-4">
-                  <label className="text-sm font-semibold text-ink">Select size</label>
+                  <label className="text-sm font-semibold text-ink">Pilih ukuran</label>
                   <Link href="/size-guide" className="inline-flex min-h-11 items-center text-xs font-semibold uppercase tracking-[0.12em] text-burgundy sm:tracking-[0.16em]">
-                    Size guide
+                    Panduan Ukuran
                   </Link>
                 </div>
                 <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
@@ -149,14 +149,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 </div>
                 {showSizeError ? (
                   <p className="mt-3 text-sm font-medium text-burgundy">
-                    Please select a size before continuing to checkout.
+                    Pilih ukuran terlebih dahulu sebelum lanjut ke pembayaran.
                   </p>
                 ) : null}
               </div>
 
               <div className="mt-7">
                 <label htmlFor="quantity" className="text-sm font-semibold text-ink">
-                  Quantity
+                  Jumlah
                 </label>
                 <div className="mt-3 inline-flex max-w-full border border-burgundy/20 bg-white">
                   <button
@@ -191,15 +191,19 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 onClick={continueToCheckout}
                 className="mt-8 flex min-h-14 w-full items-center justify-center bg-burgundy px-4 text-center text-sm font-semibold uppercase leading-5 tracking-[0.08em] text-white transition hover:bg-burgundy-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite sm:px-6 sm:tracking-[0.18em]"
               >
-                Continue to Checkout
+                Lanjut ke Pembayaran
               </button>
+              
+              <p className="mt-4 text-center text-xs text-muted">
+                Stok dan ukuran akan dikonfirmasi oleh admin setelah pembayaran.
+              </p>
 
               <div className="mt-8 border border-burgundy/10 bg-white p-5 text-sm">
-                <p className="font-semibold text-ink">How to order</p>
+                <p className="font-semibold text-ink">Cara pemesanan</p>
                 <ol className="mt-3 grid gap-2 text-muted">
-                  <li className="flex gap-2"><span className="font-semibold text-burgundy">1.</span> Choose your tee</li>
-                  <li className="flex gap-2"><span className="font-semibold text-burgundy">2.</span> Pay with GoPay Merchant QR</li>
-                  <li className="flex gap-2"><span className="font-semibold text-burgundy">3.</span> Confirm to WhatsApp</li>
+                  <li className="flex gap-2"><span className="font-semibold text-burgundy">1.</span> Pilih produk</li>
+                  <li className="flex gap-2"><span className="font-semibold text-burgundy">2.</span> Bayar dengan GoPay QR</li>
+                  <li className="flex gap-2"><span className="font-semibold text-burgundy">3.</span> Konfirmasi via WhatsApp</li>
                 </ol>
               </div>
             </div>

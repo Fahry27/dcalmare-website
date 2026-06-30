@@ -30,6 +30,14 @@ npm run start
 
 This project is intended to deploy on Vercel using the default Next.js settings. After the GitHub repository is connected to Vercel, every push to the `main` branch should trigger an automatic production deployment or deployment according to the Vercel project settings.
 
+## Required Manual Steps Before Launch
+
+Before launching the site to real customers, the store owner **must** complete these steps:
+1. **Update WhatsApp Number:** Change `ADMIN_WHATSAPP_NUMBER` in `components/CheckoutForm.tsx` to the store's actual WhatsApp number.
+2. **Update GoPay QR Code:** Replace the dummy QR image at `public/payment/gopay-merchant-qr.png` with the real GoPay Merchant QR.
+3. **Verify Product Data:** Ensure `data/products.ts` contains accurate stock, price, and descriptions.
+4. **Verify Brand Assets:** Replace `public/brand/*` and `public/products/*` with the high-resolution brand photography.
+
 ## Required Public Assets
 
 The website expects these files in `public/`:

@@ -53,7 +53,7 @@ function CheckoutErrorState({
       <div className="container-pad">
         <div className="mx-auto max-w-2xl border border-burgundy/12 bg-white p-5 text-center sm:p-8">
           <p className="break-words text-xs font-semibold uppercase tracking-[0.16em] text-burgundy sm:tracking-[0.22em]">
-            Checkout unavailable
+            Checkout Tidak Tersedia
           </p>
           <h1 className="mt-4 break-words font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl">
             {title}
@@ -63,7 +63,7 @@ function CheckoutErrorState({
             href="/shop"
             className="mt-7 inline-flex min-h-12 w-full items-center justify-center bg-burgundy px-5 text-center text-sm font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-burgundy-dark sm:w-auto sm:px-6 sm:tracking-[0.16em]"
           >
-            Back to shop
+            Kembali ke katalog
           </Link>
         </div>
       </div>
@@ -142,8 +142,8 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
   if (!productSlug) {
     return (
       <CheckoutErrorState
-        title="Product is missing."
-        message="This checkout link does not include a product. Please choose an item from the shop before checking out."
+        title="Produk tidak ditemukan."
+        message="Tautan checkout ini tidak memiliki produk. Silakan pilih produk dari halaman katalog."
       />
     );
   }
@@ -151,8 +151,8 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
   if (!product) {
     return (
       <CheckoutErrorState
-        title="Product not found."
-        message="This checkout link references a product that is not available in the dCalmare catalog."
+        title="Produk tidak ditemukan."
+        message="Produk yang dipilih tidak tersedia di katalog dCalmare."
       />
     );
   }
@@ -160,8 +160,8 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
   if (!selectedSize) {
     return (
       <CheckoutErrorState
-        title="Size is missing."
-        message="This checkout link does not include a selected size. Please return to the product page and choose a size."
+        title="Ukuran belum dipilih."
+        message="Tautan checkout ini tidak memiliki ukuran. Silakan kembali ke halaman produk dan pilih ukuran."
       />
     );
   }
@@ -169,8 +169,8 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
   if (!product.sizes.includes(selectedSize)) {
     return (
       <CheckoutErrorState
-        title="Size is not available."
-        message="The selected size is not available for this product. Please choose an available size from the product page."
+        title="Ukuran tidak tersedia."
+        message="Ukuran yang dipilih tidak tersedia untuk produk ini."
       />
     );
   }
@@ -178,8 +178,8 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
   if (!quantity) {
     return (
       <CheckoutErrorState
-        title="Quantity is invalid."
-        message="This checkout link has an invalid quantity. Please choose a quantity of at least 1 from the product page."
+        title="Jumlah tidak valid."
+        message="Silakan pilih jumlah minimal 1 dari halaman produk."
       />
     );
   }
@@ -192,34 +192,33 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
             Checkout
           </p>
           <h1 className="mt-4 break-words font-serif text-4xl font-semibold leading-tight text-ink sm:text-5xl md:text-6xl">
-            Complete your order.
+            Selesaikan pesanan.
           </h1>
           <p className="mt-5 text-base leading-relaxed text-muted md:leading-8">
-            Fill your delivery details, scan the GoPay Merchant QR, then confirm
-            the paid order to dCalmare admin via WhatsApp.
+            Isi detail pengiriman, scan QR GoPay Merchant, lalu konfirmasi pesanan ke admin dCalmare melalui WhatsApp.
           </p>
         </div>
 
         <div className="mt-8 grid min-w-0 gap-6 lg:mt-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <aside className="min-w-0 border border-burgundy/12 bg-white p-4 sm:p-5 md:p-7 lg:sticky lg:top-28">
             <h2 className="break-words font-serif text-3xl font-semibold leading-tight text-ink">
-              Order summary
+              Ringkasan pesanan
             </h2>
             <dl className="mt-6 grid gap-4 text-sm">
               <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
-                <dt className="text-muted">Product name</dt>
+                <dt className="text-muted">Nama Produk</dt>
                 <dd className="break-words text-right font-semibold text-ink">{product.name}</dd>
               </div>
               <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
-                <dt className="text-muted">Size</dt>
+                <dt className="text-muted">Ukuran</dt>
                 <dd className="text-right font-semibold text-ink">{selectedSize}</dd>
               </div>
               <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
-                <dt className="text-muted">Quantity</dt>
+                <dt className="text-muted">Jumlah</dt>
                 <dd className="text-right font-semibold text-ink">{quantity}</dd>
               </div>
               <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
-                <dt className="text-muted">Unit price</dt>
+                <dt className="text-muted">Harga Satuan</dt>
                 <dd className="text-right font-semibold text-ink">
                   {formatRupiah(product.price)}
                 </dd>
@@ -234,73 +233,79 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
           <div className="grid min-w-0 gap-6">
             <form className="min-w-0 border border-burgundy/12 bg-white p-4 sm:p-5 md:p-7">
               <h2 className="break-words font-serif text-3xl font-semibold leading-tight text-ink">
-                Delivery details
+                Detail pengiriman
               </h2>
               <div className="mt-6 grid gap-5">
                 <label className="grid gap-2 text-sm font-semibold text-ink">
-                  Full name
+                  Nama Lengkap
                   <input
                     type="text"
                     value={fields.fullName}
                     onChange={(event) => updateField("fullName", event.target.value)}
-                    className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
+                    placeholder="Nama sesuai identitas"
+                    className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
                     autoComplete="name"
                     required
                   />
                 </label>
                 <label className="grid gap-2 text-sm font-semibold text-ink">
-                  WhatsApp number
+                  Nomor WhatsApp
                   <input
                     type="tel"
                     value={fields.whatsapp}
                     onChange={(event) => updateField("whatsapp", event.target.value)}
-                    className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
+                    placeholder="08..."
+                    className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
                     autoComplete="tel"
                     required
                   />
                 </label>
                 <label className="grid gap-2 text-sm font-semibold text-ink">
-                  Full address
+                  Alamat Lengkap
                   <textarea
                     value={fields.address}
                     onChange={(event) => updateField("address", event.target.value)}
-                    className="min-h-28 w-full resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
+                    placeholder="Nama jalan, gedung, RT/RW, nomor rumah, patokan"
+                    className="min-h-28 w-full resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
                     required
                   />
                 </label>
                 <div className="grid gap-5 md:grid-cols-2">
                   <label className="grid gap-2 text-sm font-semibold text-ink">
-                    City / District
+                    Kecamatan / Kota
                     <input
                       type="text"
                       value={fields.cityDistrict}
                       onChange={(event) =>
                         updateField("cityDistrict", event.target.value)
                       }
-                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
+                      placeholder="Kecamatan, Kota"
+                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
                       required
                     />
                   </label>
                   <label className="grid gap-2 text-sm font-semibold text-ink">
-                    Postal code
+                    Kode Pos
                     <input
                       type="text"
                       value={fields.postalCode}
                       onChange={(event) =>
                         updateField("postalCode", event.target.value)
                       }
-                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
+                      placeholder="Kodepos"
+                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
                       autoComplete="postal-code"
                       required
                     />
                   </label>
                 </div>
                 <label className="grid gap-2 text-sm font-semibold text-ink">
-                  Order notes optional
+                  Catatan Pesanan (Opsional)
                   <textarea
                     value={fields.notes}
                     onChange={(event) => updateField("notes", event.target.value)}
-                    className="min-h-24 w-full resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
+                    placeholder="Titip pesan untuk admin (opsional)"
+                    className="min-h-24 w-full resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
                   />
                 </label>
               </div>
@@ -309,9 +314,12 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
             <QRPaymentSection />
 
             <div className="grid gap-3">
+              <p className="text-center text-sm font-medium text-burgundy bg-cream border border-burgundy/15 p-3">
+                Pastikan data pesanan sudah benar sebelum melakukan pembayaran.
+              </p>
               {!isFormComplete ? (
                 <p className="text-center text-sm font-medium text-burgundy">
-                  Please fill all required delivery details to continue.
+                  Harap lengkapi semua detail pengiriman untuk melanjutkan.
                 </p>
               ) : null}
               <button
@@ -325,8 +333,8 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
             </div>
 
             <div className="mt-6 text-center text-xs text-muted">
-              <p>Manual payment verification by dCalmare team.</p>
-              <p className="mt-1">Setelah klik tombol ini, kirim bukti pembayaran melalui WhatsApp.</p>
+              <p>Pembayaran diverifikasi manual oleh tim dCalmare.</p>
+              <p className="mt-1">Kirim bukti pembayaran setelah WhatsApp terbuka.</p>
             </div>
           </div>
         </div>
