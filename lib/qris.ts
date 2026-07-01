@@ -1,4 +1,9 @@
-import { makeString } from "qris-dinamis";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const { makeString } = require("qris-dinamis") as {
+  makeString: (qris: string, options: { nominal: string; taxtype?: "p" | "r"; fee?: string }) => string;
+};
 
 export function makeDynamicQris(staticQris: string, amount: number): string {
   if (!Number.isFinite(amount) || amount <= 0) {
