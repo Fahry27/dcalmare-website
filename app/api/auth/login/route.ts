@@ -12,8 +12,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
     }
 
-    const customer = await prisma.customer.findUnique({
-      where: { username }
+    const customer = await prisma.customer.findFirst({
+      where: {
+        OR: [
+          { username },
+          { email: username } // Allowing them to type email in the username field
+        ]
+      }
     });
 
     if (!customer) {

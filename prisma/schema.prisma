@@ -10,12 +10,25 @@ generator client {
 model Customer {
   id        String   @id @default(cuid())
   username  String   @unique
+  email     String   @unique
   password  String
   name      String
   phone     String
   orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model OtpVerification {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  otp       String
+  expiresAt DateTime
+  
+  // Storing temporary registration data as JSON
+  tempData  String?
+  
+  createdAt DateTime @default(now())
 }
 
 model Order {

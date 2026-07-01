@@ -43,7 +43,7 @@ function LoginForm() {
       {error && <div className="p-3 bg-red-100 text-red-800 text-sm rounded-sm">{error}</div>}
       
       <label className="grid gap-2 text-sm font-semibold text-ink">
-        Username
+        Username / Email
         <input 
           type="text" 
           value={username}
