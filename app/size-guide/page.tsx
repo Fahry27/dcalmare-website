@@ -15,14 +15,14 @@ export default function SizeGuidePage() {
             Size Guide
           </p>
           <h1 className="mt-4 break-words font-serif text-4xl font-semibold leading-tight text-ink sm:text-5xl md:text-6xl">
-            Oversized tee measurements.
+            OVRZSD boxycut tshirt.
           </h1>
           <p className="mt-5 text-base leading-relaxed text-muted md:leading-8">
-            Measurements are approximate and designed for an oversized, boxy
-            silhouette.
+            Size chart resmi dCalmare untuk potongan oversized boxycut. Width
+            dan length mengikuti ukuran pada chart produk.
           </p>
           <p className="mt-3 text-sm font-medium text-burgundy">
-            Geser tabel untuk melihat ukuran lengkap.
+            Available sizes: M, L, XL.
           </p>
         </div>
         <div className="mt-8 md:mt-10">

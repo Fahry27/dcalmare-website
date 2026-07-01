@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { makeDynamicQris } from "@/lib/qris";
 import { getSession } from "@/lib/auth";
 import { publicProductWhere } from "@/lib/product-visibility";
+import { isAvailableProductSize } from "@/lib/size-chart";
 
 const STATIC_QRIS = "00020101021126610014COM.GO-JEK.WWW01189360091439001046560210G9001046560303UMI51440014ID.CO.QRIS.WWW0215ID10264743996500303UMI5204581253033605802ID5918Brochacho Holdings6007TANGSEL61051522062070703A01630416A7";
 
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
 
     const normalizedItems = requestedItems.map((item: any) => {
       const product = productBySlug.get(item.productSlug);
-      if (!product || !product.sizes.includes(item.size)) {
+      if (!product || !product.sizes.includes(item.size) || !isAvailableProductSize(item.size)) {
         throw new Error("Invalid checkout item");
       }
 

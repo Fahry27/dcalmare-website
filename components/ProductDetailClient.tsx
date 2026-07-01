@@ -9,6 +9,7 @@ import ProductCard from "@/components/ProductCard";
 import { useCartStore } from "@/store/useCartStore";
 import WishlistButton from "./WishlistButton";
 import PreOrderProgress from "./PreOrderProgress";
+import { isAvailableProductSize } from "@/lib/size-chart";
 
 type ProductDetailClientProps = {
   product: Product;
@@ -20,6 +21,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [showSizeError, setShowSizeError] = useState(false);
+  const productSizes = product.sizes.filter(isAvailableProductSize);
 
   function updateQuantity(nextQuantity: number) {
     setQuantity(clampQuantity(nextQuantity));
@@ -122,7 +124,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                   </Link>
                 </div>
                 <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
-                  {product.sizes.map((size) => (
+                  {productSizes.map((size) => (
                     <button
                       key={size}
                       type="button"
