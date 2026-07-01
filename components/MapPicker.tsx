@@ -85,25 +85,25 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
   const [position, setPosition] = useState<L.LatLng | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   
   // Default to Jakarta
   const defaultCenter = { lat: -6.2088, lng: 106.8456 };
 
   // Try to get user's current location on mount
   useEffect(() => {
-    if ("geolocation" in navigator) {
+    // Get initial location based on IP or default to Jakarta
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          const latlng = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
-          setPosition(latlng);
+          setPosition(new L.LatLng(pos.coords.latitude, pos.coords.longitude));
         },
-        (err) => {
-          console.error("Geolocation error:", err);
-          setPosition(new L.LatLng(defaultCenter.lat, defaultCenter.lng));
+        () => {
+          setPosition(new L.LatLng(-6.2088, 106.8456)); // Jakarta
         }
       );
     } else {
-      setPosition(new L.LatLng(defaultCenter.lat, defaultCenter.lng));
+      setPosition(new L.LatLng(-6.2088, 106.8456));
     }
   }, []);
 
@@ -111,17 +111,18 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
     if (!searchQuery.trim()) return;
     
     setIsSearching(true);
+    setSearchResults([]);
+    
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`, {
+      // Fetch up to 5 results for predictions
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&addressdetails=1`, {
         headers: { "Accept-Language": "id-ID" }
       });
       const data = await res.json();
       if (data && data.length > 0) {
-        const latlng = new L.LatLng(data[0].lat, data[0].lon);
-        setPosition(latlng);
-        onLocationSelect(data[0].display_name);
+        setSearchResults(data);
       } else {
-        alert("Alamat tidak ditemukan. Coba kata kunci lain.");
+        alert("Alamat tidak ditemukan di peta. Coba cari nama kecamatan atau kotanya saja, lalu geser pin merah secara manual ke lokasi akurat Anda.");
       }
     } catch (err) {
       console.error(err);
@@ -131,34 +132,61 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
     }
   }
 
+  function handleSelectResult(result: any) {
+    const latlng = new L.LatLng(result.lat, result.lon);
+    setPosition(latlng);
+    onLocationSelect(result.display_name);
+    setSearchResults([]);
+    setSearchQuery(result.name || "");
+  }
+
   if (!position) {
     return <div className="h-[400px] w-full bg-offwhite animate-pulse border border-burgundy/15 flex items-center justify-center text-sm text-muted">Memuat peta...</div>;
   }
 
   return (
     <div className="relative h-[400px] w-full border border-burgundy/15 z-0 flex flex-col">
-      <div className="absolute top-2 left-2 right-2 z-[400] flex gap-2">
-        <input 
-          type="text" 
-          placeholder="Cari jalan, kecamatan, atau kota..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault(); // Mencegah form checkout tersubmit
-              handleSearch();
-            }
-          }}
-          className="flex-1 min-h-10 px-3 py-2 text-sm border border-burgundy/20 bg-white/95 shadow-sm outline-none focus:border-burgundy rounded-sm"
-        />
-        <button 
-          type="button" 
-          onClick={handleSearch}
-          disabled={isSearching}
-          className="min-h-10 px-4 bg-burgundy text-white text-sm font-semibold rounded-sm shadow-sm hover:bg-burgundy-dark transition-colors disabled:opacity-70"
-        >
-          {isSearching ? "Mencari..." : "Cari"}
-        </button>
+      <div className="absolute top-2 left-2 right-2 z-[400]">
+        <div className="flex gap-2">
+          <input 
+            type="text" 
+            placeholder="Cari jalan, kecamatan, atau kota..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); // Mencegah form checkout tersubmit
+                handleSearch();
+              }
+            }}
+            className="flex-1 min-h-10 px-3 py-2 text-sm border border-burgundy/20 bg-white/95 shadow-sm outline-none focus:border-burgundy rounded-sm"
+          />
+          <button 
+            type="button" 
+            onClick={handleSearch}
+            disabled={isSearching}
+            className="min-h-10 px-4 bg-burgundy text-white text-sm font-semibold rounded-sm shadow-sm hover:bg-burgundy-dark transition-colors disabled:opacity-70"
+          >
+            {isSearching ? "Mencari..." : "Cari"}
+          </button>
+        </div>
+        
+        {/* Search Results Dropdown */}
+        {searchResults.length > 0 && (
+          <div className="mt-2 bg-white border border-burgundy/20 rounded-sm shadow-lg max-h-48 overflow-y-auto">
+            {searchResults.map((result, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => handleSelectResult(result)}
+                className="w-full text-left px-3 py-2 text-sm hover:bg-offwhite border-b border-burgundy/5 last:border-0 transition-colors"
+              >
+                <div className="font-semibold text-ink truncate">{result.name}</div>
+                <div className="text-xs text-muted truncate">{result.display_name}</div>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       
       <MapContainer 

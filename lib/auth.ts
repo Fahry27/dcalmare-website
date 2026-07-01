@@ -20,9 +20,11 @@ export async function verifyToken(token: string) {
   }
 }
 
-export async function getSession() {
+export async function getSession(): Promise<{ id: string; username: string; name: string; phone: string } | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("dcalmare_session")?.value;
   if (!token) return null;
-  return await verifyToken(token);
+  const payload = await verifyToken(token);
+  if (!payload) return null;
+  return payload as any;
 }
