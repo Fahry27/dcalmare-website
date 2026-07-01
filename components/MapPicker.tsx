@@ -71,8 +71,20 @@ function LocationMarker({ position, setPosition, onLocationSelect }: any) {
   );
 }
 
+function MapUpdater({ center }: { center: L.LatLng | null }) {
+  const map = useMapEvents({});
+  useEffect(() => {
+    if (center) {
+      map.flyTo(center, 15);
+    }
+  }, [center, map]);
+  return null;
+}
+
 export default function MapPicker({ onLocationSelect }: MapPickerProps) {
   const [position, setPosition] = useState<L.LatLng | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   
   // Default to Jakarta
   const defaultCenter = { lat: -6.2088, lng: 106.8456 };
@@ -95,12 +107,54 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
     }
   }, []);
 
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    
+    setIsSearching(true);
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`, {
+        headers: { "Accept-Language": "id-ID" }
+      });
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const latlng = new L.LatLng(data[0].lat, data[0].lon);
+        setPosition(latlng);
+        onLocationSelect(data[0].display_name);
+      } else {
+        alert("Alamat tidak ditemukan. Coba kata kunci lain.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Gagal mencari alamat.");
+    } finally {
+      setIsSearching(false);
+    }
+  }
+
   if (!position) {
-    return <div className="h-64 w-full bg-offwhite animate-pulse border border-burgundy/15 flex items-center justify-center text-sm text-muted">Memuat peta...</div>;
+    return <div className="h-[400px] w-full bg-offwhite animate-pulse border border-burgundy/15 flex items-center justify-center text-sm text-muted">Memuat peta...</div>;
   }
 
   return (
-    <div className="relative h-64 w-full border border-burgundy/15 z-0">
+    <div className="relative h-[400px] w-full border border-burgundy/15 z-0 flex flex-col">
+      <form onSubmit={handleSearch} className="absolute top-2 left-2 right-2 z-[400] flex gap-2">
+        <input 
+          type="text" 
+          placeholder="Cari jalan, kecamatan, atau kota..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1 min-h-10 px-3 py-2 text-sm border border-burgundy/20 bg-white/95 shadow-sm outline-none focus:border-burgundy rounded-sm"
+        />
+        <button 
+          type="submit" 
+          disabled={isSearching}
+          className="min-h-10 px-4 bg-burgundy text-white text-sm font-semibold rounded-sm shadow-sm hover:bg-burgundy-dark transition-colors disabled:opacity-70"
+        >
+          {isSearching ? "Mencari..." : "Cari"}
+        </button>
+      </form>
+      
       <MapContainer 
         center={position} 
         zoom={15} 
@@ -112,9 +166,10 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <LocationMarker position={position} setPosition={setPosition} onLocationSelect={onLocationSelect} />
+        <MapUpdater center={position} />
       </MapContainer>
-      <div className="absolute top-2 right-2 z-[400] pointer-events-none bg-white/90 px-3 py-1.5 text-xs text-ink font-medium rounded shadow-sm border border-burgundy/10">
-        Klik / Geser Pin
+      <div className="absolute bottom-2 right-2 z-[400] pointer-events-none bg-white/90 px-3 py-1.5 text-xs text-ink font-medium rounded shadow-sm border border-burgundy/10">
+        Geser pin untuk akurasi
       </div>
     </div>
   );
