@@ -50,3 +50,29 @@ model Order {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  category        String
+  price           Int
+  description     String
+  material        String
+  fit             String
+  color           String
+  sizes           String[]
+  image           String
+  lifestyleImage  String
+  isBestSeller    Boolean  @default(false)
+  isNewArrival    Boolean  @default(false)
+
+  // Pre-Order Management Fields
+  isPreOrder      Boolean  @default(true)
+  preOrderEnd     DateTime?
+  preOrderQuota   Int?
+  preOrderSold    Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

@@ -6,7 +6,7 @@ import HeroSection from "@/components/HeroSection";
 import HowToOrder from "@/components/HowToOrder";
 import ProductGrid from "@/components/ProductGrid";
 import SafeImage from "@/components/SafeImage";
-import { products } from "@/data/products";
+import prisma from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "dCalmare | One summer can change everything",
@@ -14,7 +14,10 @@ export const metadata: Metadata = {
     "Shop dCalmare's first drop of summer-inspired oversized white graphic tees."
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const products = await prisma.product.findMany({
+    orderBy: { createdAt: "asc" }
+  });
   const highlightedProduct = products[0];
 
   return (
@@ -40,7 +43,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="mt-10">
-            <ProductGrid />
+            <ProductGrid products={products} limit={3} />
           </div>
         </div>
       </section>

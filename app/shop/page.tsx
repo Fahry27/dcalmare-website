@@ -1,17 +1,48 @@
 import type { Metadata } from "next";
-import ProductGrid from "@/components/ProductGrid";
 import ScrollReveal from "@/components/ScrollReveal";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
+import prisma from "@/lib/prisma";
+import ShopFilter from "@/components/ShopFilter";
+import { Suspense } from "react";
+import { Prisma } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Shop First Drop",
   description: "Shop dCalmare's first drop of oversized white graphic tees."
 };
 
-export default function ShopPage() {
+type ShopPageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function ShopPage({ searchParams }: ShopPageProps) {
+  const params = await searchParams;
+  const q = typeof params.q === "string" ? params.q : undefined;
+  const category = typeof params.category === "string" ? params.category : undefined;
+  const sort = typeof params.sort === "string" ? params.sort : undefined;
+
+  const where: Prisma.ProductWhereInput = {};
+  if (q) {
+    where.name = { contains: q, mode: "insensitive" };
+  }
+  if (category) {
+    where.category = category;
+  }
+
+  let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: "desc" };
+  if (sort === "price_asc") {
+    orderBy = { price: "asc" };
+  } else if (sort === "price_desc") {
+    orderBy = { price: "desc" };
+  }
+
+  const products = await prisma.product.findMany({
+    where,
+    orderBy
+  });
+
   return (
-    <section className="bg-offwhite py-10 md:py-20">
+    <section className="bg-offwhite py-10 md:py-20 min-h-screen">
       <div className="container-pad">
         <div className="max-w-2xl min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-burgundy sm:tracking-[0.24em]">
@@ -25,14 +56,25 @@ export default function ShopPage() {
             and calm streetwear energy.
           </p>
         </div>
-        <div className="mt-8 md:mt-10">
-          <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-4">
-            {products.map((product, index) => (
-              <ScrollReveal key={product.id} delay={index * 0.1}>
-                <ProductCard product={product} />
-              </ScrollReveal>
-            ))}
-          </div>
+        
+        <div className="mt-8 md:mt-12">
+          <Suspense fallback={<div>Loading filters...</div>}>
+            <ShopFilter />
+          </Suspense>
+
+          {products.length === 0 ? (
+            <div className="py-20 text-center">
+              <p className="text-muted">Tidak ada produk yang cocok dengan pencarian Anda.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-4">
+              {products.map((product, index) => (
+                <ScrollReveal key={product.id} delay={index * 0.1}>
+                  <ProductCard product={product as any} />
+                </ScrollReveal>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

@@ -2,29 +2,26 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import SafeImage from "@/components/SafeImage";
-import type { Product } from "@/data/products";
-import { products } from "@/data/products";
+import type { Product } from "@prisma/client";
 import { clampQuantity, cn, formatRupiah } from "@/lib/utils";
 import ProductCard from "@/components/ProductCard";
 import { useCartStore } from "@/store/useCartStore";
+import WishlistButton from "./WishlistButton";
+import PreOrderProgress from "./PreOrderProgress";
 
 type ProductDetailClientProps = {
   product: Product;
+  relatedProducts: Product[];
 };
 
-export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+export default function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [showSizeError, setShowSizeError] = useState(false);
-
-  const relatedProducts = useMemo(
-    () => products.filter((item) => item.slug !== product.slug).slice(0, 2),
-    [product.slug]
-  );
 
   function updateQuantity(nextQuantity: number) {
     setQuantity(clampQuantity(nextQuantity));
@@ -91,12 +88,27 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <h1 className="mt-3 break-words font-serif text-4xl font-semibold leading-tight text-ink md:mt-4 md:text-6xl">
                 {product.name}
               </h1>
-              <p className="mt-4 text-xl font-semibold text-burgundy">
-                {formatRupiah(product.price)}
-              </p>
+              <div className="mt-4 flex items-center gap-4">
+                <p className="text-xl font-semibold text-burgundy">
+                  {formatRupiah(product.price)}
+                </p>
+                <WishlistButton 
+                  product={product} 
+                  className="bg-white border border-burgundy/20 rounded-full p-2.5 shadow-sm hover:border-burgundy"
+                  iconClassName="w-5 h-5"
+                />
+              </div>
               <p className="mt-5 text-base leading-relaxed text-muted md:mt-6 md:leading-8">
                 {product.description}
               </p>
+
+              {product.isPreOrder && (
+                <PreOrderProgress 
+                  endDate={product.preOrderEnd}
+                  quota={product.preOrderQuota}
+                  sold={product.preOrderSold}
+                />
+              )}
 
               <dl className="mt-8 grid gap-3 border-y border-burgundy/10 py-6 text-sm">
                 <div className="grid grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] gap-4">

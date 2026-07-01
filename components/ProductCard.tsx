@@ -1,7 +1,8 @@
 import Link from "next/link";
 import SafeImage from "@/components/SafeImage";
-import type { Product } from "@/data/products";
+import type { Product } from "@prisma/client";
 import { formatRupiah } from "@/lib/utils";
+import WishlistButton from "./WishlistButton";
 
 type ProductCardProps = {
   product: Product;
@@ -23,17 +24,24 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="object-contain p-5 transition duration-500 group-hover:scale-[1.03] sm:p-7"
             fallbackLabel={product.name}
           />
-          <div className="absolute left-3 right-3 top-3 flex flex-wrap gap-2 sm:left-4 sm:right-4 sm:top-4">
-            {product.isBestSeller ? (
-              <span className="bg-burgundy px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white sm:px-3 sm:tracking-[0.18em]">
-                Best Seller
-              </span>
-            ) : null}
-            {product.isNewArrival ? (
-              <span className="bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-burgundy sm:px-3 sm:tracking-[0.18em]">
-                New
-              </span>
-            ) : null}
+          <div className="absolute left-3 right-3 top-3 flex items-start justify-between sm:left-4 sm:right-4 sm:top-4">
+            <div className="flex flex-wrap gap-2">
+              {product.isBestSeller ? (
+                <span className="bg-burgundy px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white sm:px-3 sm:tracking-[0.18em]">
+                  Best Seller
+                </span>
+              ) : null}
+              {product.isNewArrival ? (
+                <span className="bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-burgundy sm:px-3 sm:tracking-[0.18em]">
+                  New
+                </span>
+              ) : null}
+            </div>
+            <WishlistButton 
+              product={product as any} 
+              className="bg-white rounded-full p-2 shadow-sm"
+              iconClassName="w-4 h-4"
+            />
           </div>
         </div>
       <div className="flex flex-1 flex-col p-4 sm:p-5">
