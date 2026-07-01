@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SafeImage from "@/components/SafeImage";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,16 @@ const navItems = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; username: string } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) setUser(data.user);
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-burgundy/10 bg-offwhite/95 backdrop-blur">
@@ -36,7 +46,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden items-center gap-7 md:flex">
+        <div className="hidden items-center gap-7 md:flex flex-1 justify-end mr-6">
           {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -48,20 +58,38 @@ export default function Navbar() {
           ))}
         </div>
 
-        <button
-          type="button"
-          className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-burgundy/20 text-burgundy md:hidden"
-          onClick={() => setIsOpen((value) => !value)}
-          aria-label="Toggle navigation menu"
-          aria-expanded={isOpen}
-        >
-          <span className="sr-only">Menu</span>
-          <span className="flex flex-col gap-1.5">
-            <span className={cn("block h-px w-5 bg-current transition", isOpen && "translate-y-2 rotate-45")} />
-            <span className={cn("block h-px w-5 bg-current transition", isOpen && "opacity-0")} />
-            <span className={cn("block h-px w-5 bg-current transition", isOpen && "-translate-y-2 -rotate-45")} />
-          </span>
-        </button>
+        <div className="flex items-center gap-3">
+          {user ? (
+            <Link 
+              href="/tracking" 
+              className="hidden md:inline-flex items-center justify-center min-h-10 px-4 text-sm font-semibold text-white bg-burgundy rounded-sm transition hover:bg-burgundy-dark"
+            >
+              Hi, {user.name.split(" ")[0]}
+            </Link>
+          ) : (
+            <Link 
+              href="/login" 
+              className="hidden md:inline-flex items-center justify-center min-h-10 px-4 text-sm font-semibold text-burgundy border border-burgundy rounded-sm transition hover:bg-burgundy hover:text-white"
+            >
+              Login
+            </Link>
+          )}
+
+          <button
+            type="button"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-burgundy/20 text-burgundy md:hidden"
+            onClick={() => setIsOpen((value) => !value)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isOpen}
+          >
+            <span className="sr-only">Menu</span>
+            <span className="flex flex-col gap-1.5">
+              <span className={cn("block h-px w-5 bg-current transition", isOpen && "translate-y-2 rotate-45")} />
+              <span className={cn("block h-px w-5 bg-current transition", isOpen && "opacity-0")} />
+              <span className={cn("block h-px w-5 bg-current transition", isOpen && "-translate-y-2 -rotate-45")} />
+            </span>
+          </button>
+        </div>
       </nav>
 
       <div

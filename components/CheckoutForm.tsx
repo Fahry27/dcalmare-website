@@ -55,9 +55,15 @@ function CheckoutErrorState({ title, message }: { title: string; message: string
   );
 }
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [fields, setFields] = useState<CheckoutFields>(initialFields);
+  const [fields, setFields] = useState<CheckoutFields>({
+    fullName: initialUser?.name || "",
+    whatsapp: initialUser?.phone || "",
+    address: "",
+    notes: ""
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [orderState, setOrderState] = useState<{ id: string; qrisString: string; status: string } | null>(null);
 

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import CheckoutForm from "@/components/CheckoutForm";
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -8,7 +10,13 @@ export const metadata: Metadata = {
     "Complete your dCalmare order, pay manually with GoPay Merchant QR, and confirm through WhatsApp after payment."
 };
 
-export default function CheckoutPage() {
+export default async function CheckoutPage() {
+  const session = await getSession();
+  
+  if (!session) {
+    redirect("/login?redirect=/checkout");
+  }
+
   return (
     <Suspense
       fallback={
@@ -17,7 +25,7 @@ export default function CheckoutPage() {
         </section>
       }
     >
-      <CheckoutForm />
+      <CheckoutForm initialUser={session} />
     </Suspense>
   );
 }
