@@ -49,12 +49,13 @@ export default function CartDrawer() {
               <button
                 onClick={() => setIsOpen(false)}
                 className="rounded-full p-2 text-muted transition hover:bg-offwhite hover:text-ink"
+                aria-label="Tutup keranjang"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
               {items.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center text-center">
                   <div className="rounded-full bg-offwhite p-6">
@@ -77,15 +78,15 @@ export default function CartDrawer() {
                   </button>
                 </div>
               ) : (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-5">
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-4">
-                      <div className="relative aspect-[3/4] w-24 shrink-0 bg-offwhite">
+                      <div className="relative aspect-[3/4] w-20 shrink-0 bg-offwhite sm:w-24">
                         <SafeImage
                           src={item.product.image}
                           alt={item.product.name}
                           fill
-                          className="object-cover"
+                          className="object-contain p-2"
                           fallbackLabel={item.product.name}
                         />
                       </div>
@@ -107,6 +108,7 @@ export default function CartDrawer() {
                                 }
                               }}
                               className="text-muted transition hover:text-burgundy"
+                              aria-label={`Kurangi jumlah ${item.product.name}`}
                             >
                               <Minus className="h-4 w-4" />
                             </button>
@@ -114,6 +116,7 @@ export default function CartDrawer() {
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               className="text-muted transition hover:text-burgundy"
+                              aria-label={`Tambah jumlah ${item.product.name}`}
                             >
                               <Plus className="h-4 w-4" />
                             </button>
@@ -122,6 +125,7 @@ export default function CartDrawer() {
                           <button
                             onClick={() => removeItem(item.id)}
                             className="text-muted transition hover:text-red-600"
+                            aria-label={`Hapus ${item.product.name}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -134,14 +138,15 @@ export default function CartDrawer() {
             </div>
 
             {items.length > 0 && (
-              <div className="border-t border-burgundy/10 bg-offwhite p-6">
+              <div className="border-t border-burgundy/10 bg-offwhite p-4 sm:p-6">
                 <div className="mb-4 flex items-center justify-between font-serif text-xl font-bold text-ink">
                   <span>Subtotal</span>
                   <span>{formatRupiah(getTotalPrice())}</span>
                 </div>
-                <p className="mb-6 text-sm text-muted">
-                  Ongkos kirim akan dihitung pada saat pembayaran.
-                </p>
+                <div className="mb-5 grid gap-2 border border-burgundy/10 bg-white p-3 text-xs leading-relaxed text-muted">
+                  <p>Ongkos kirim dihitung di checkout.</p>
+                  <p>Bayar pakai QRIS dinamis, lalu klik konfirmasi pembayaran.</p>
+                </div>
                 <button
                   onClick={() => {
                     setIsOpen(false);

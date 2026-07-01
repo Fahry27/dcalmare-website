@@ -23,17 +23,34 @@ export const metadata: Metadata = {
   },
   description:
     "Summer-inspired graphic tees made to remind you to slow down, feel present, and wear the moment.",
-  metadataBase: new URL("https://dcalmare.local"),
+  metadataBase: new URL("https://dcalmare-website.vercel.app"),
+  alternates: {
+    canonical: "/"
+  },
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png"
+  },
   openGraph: {
     title: "dCalmare | One summer can change everything.",
     description: "Summer-inspired graphic tees made to remind you to slow down, feel present, and wear the moment.",
+    url: "/",
+    images: [
+      {
+        url: "/products/bottle-collection-tee-lifestyle.jpg",
+        width: 1079,
+        height: 1349,
+        alt: "dCalmare first drop graphic tee"
+      }
+    ],
     type: "website",
     siteName: "dCalmare"
   },
   twitter: {
     card: "summary_large_image",
     title: "dCalmare | One summer can change everything.",
-    description: "Summer-inspired graphic tees made to remind you to slow down, feel present, and wear the moment."
+    description: "Summer-inspired graphic tees made to remind you to slow down, feel present, and wear the moment.",
+    images: ["/products/bottle-collection-tee-lifestyle.jpg"]
   }
 };
 

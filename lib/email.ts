@@ -1,13 +1,18 @@
 import { Resend } from "resend";
 import { InvoiceTemplate } from "./email-templates/Invoice";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "re_FVsTc2CR_hMTN9y9xnawknSMHCWiwzXzm");
-
 export async function sendInvoiceEmail(order: any) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY is not configured; invoice email skipped.");
+    return;
+  }
+
   if (!order.customer?.email) {
     console.log("No customer email found for order", order.id);
     return;
   }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   // Parse serialized items
   let items = [];

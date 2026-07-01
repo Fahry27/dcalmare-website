@@ -132,12 +132,13 @@ export default async function ProfilePage() {
                             <div className={cn(
                               "text-center py-2 text-xs font-bold uppercase tracking-wider w-full",
                               order.status === "PENDING" ? "bg-yellow-100 text-yellow-800" :
+                              order.status === "WAITING_CONFIRMATION" ? "bg-orange-100 text-orange-800" :
                               order.status === "PAID" ? "bg-green-100 text-green-800" :
                               order.status === "SHIPPED" ? "bg-blue-100 text-blue-800" :
                               order.status === "COMPLETED" ? "bg-teal-100 text-teal-800" :
                               "bg-red-100 text-red-800"
                             )}>
-                              {order.status}
+                              {order.status === "WAITING_CONFIRMATION" ? "CEK MUTASI" : order.status}
                             </div>
                           </div>
                         </div>

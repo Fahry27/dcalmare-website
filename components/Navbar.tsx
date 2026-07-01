@@ -112,27 +112,31 @@ export default function Navbar() {
         </div>
       </nav>
 
-      <div
-        className={cn(
-          "grid transition-all duration-300 ease-in-out md:hidden",
-          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        )}
-      >
-        <div className="overflow-hidden border-t border-burgundy/10 bg-offwhite">
-          <div className="container-pad grid gap-1 py-4">
-            {navItems.map((item) => (
+      {isOpen ? (
+        <div className="grid transition-all duration-300 ease-in-out md:hidden">
+          <div className="overflow-hidden border-t border-burgundy/10 bg-offwhite">
+            <div className="container-pad grid gap-1 py-4">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex min-h-12 items-center py-2 text-base font-medium text-ink transition hover:text-burgundy active:scale-[0.98]"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
               <Link
-                key={item.href}
-                href={item.href}
-                className="flex min-h-12 items-center py-2 text-base font-medium text-ink transition hover:text-burgundy active:scale-[0.98]"
+                href={user ? "/profile" : "/login"}
+                className="mt-2 flex min-h-12 items-center border-t border-burgundy/10 py-3 text-base font-semibold text-burgundy"
                 onClick={() => setIsOpen(false)}
               >
-                {item.label}
+                {user ? "Profil Saya" : "Login"}
               </Link>
-            ))}
+            </div>
           </div>
         </div>
-      </div>
+      ) : null}
     </header>
   );
 }

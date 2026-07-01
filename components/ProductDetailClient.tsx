@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import SafeImage from "@/components/SafeImage";
 import type { Product } from "@prisma/client";
@@ -17,7 +16,6 @@ type ProductDetailClientProps = {
 };
 
 export default function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
-  const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -38,38 +36,26 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
 
   return (
     <>
-      <section className="bg-offwhite py-8 md:py-16">
+      <section className="bg-offwhite pb-24 pt-5 md:py-16">
         <div className="container-pad">
           <Link href="/shop" className="inline-flex min-h-11 items-center text-sm font-semibold text-burgundy transition hover:text-burgundy-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite">
             Kembali ke katalog
           </Link>
 
-          <div className="mt-6 grid min-w-0 gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-start">
-            <div className="grid min-w-0 gap-4">
-              <div className="relative aspect-square max-h-[390px] min-w-0 overflow-hidden border border-burgundy/10 bg-cream sm:aspect-[4/5] sm:max-h-none">
-                <SafeImage
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-contain p-5 sm:p-8 md:p-12"
-                  fallbackLabel={product.name}
-                />
-              </div>
-              <div className="relative aspect-[4/5] max-h-[430px] min-w-0 overflow-hidden border border-burgundy/10 bg-cream sm:max-h-none">
-                <SafeImage
-                  src={product.lifestyleImage}
-                  alt={`${product.name} lifestyle styling`}
-                  fill
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-cover"
-                  fallbackLabel={`${product.name} lifestyle`}
-                />
-              </div>
+          <div className="mt-4 grid min-w-0 gap-5 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+            <div className="relative aspect-square max-h-[360px] min-w-0 overflow-hidden border border-burgundy/10 bg-cream sm:aspect-[4/5] sm:max-h-none lg:col-start-1 lg:row-start-1">
+              <SafeImage
+                src={product.image}
+                alt={product.name}
+                fill
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-contain p-5 sm:p-8 md:p-12"
+                fallbackLabel={product.name}
+              />
             </div>
 
-            <div className="min-w-0 lg:sticky lg:top-28">
+            <div className="min-w-0 lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1">
               <div className="mb-3 flex flex-wrap gap-2">
                 {product.isBestSeller ? (
                   <span className="bg-burgundy px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white sm:px-3 sm:tracking-[0.18em]">
@@ -85,7 +71,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               <p className="break-words text-xs font-semibold uppercase tracking-[0.18em] text-burgundy sm:tracking-[0.22em]">
                 {product.category}
               </p>
-              <h1 className="mt-3 break-words font-serif text-4xl font-semibold leading-tight text-ink md:mt-4 md:text-6xl">
+              <h1 className="mt-3 break-words font-serif text-3xl font-semibold leading-tight text-ink min-[360px]:text-4xl md:mt-4 md:text-6xl">
                 {product.name}
               </h1>
               <div className="mt-4 flex items-center gap-4">
@@ -210,11 +196,38 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                 <p className="font-semibold text-ink">Cara pemesanan</p>
                 <ol className="mt-3 grid gap-2 text-muted">
                   <li className="flex gap-2"><span className="font-semibold text-burgundy">1.</span> Pilih produk</li>
-                  <li className="flex gap-2"><span className="font-semibold text-burgundy">2.</span> Bayar dengan GoPay QR</li>
-                  <li className="flex gap-2"><span className="font-semibold text-burgundy">3.</span> Konfirmasi via WhatsApp</li>
+                  <li className="flex gap-2"><span className="font-semibold text-burgundy">2.</span> Checkout sebagai tamu atau member</li>
+                  <li className="flex gap-2"><span className="font-semibold text-burgundy">3.</span> Bayar dengan QRIS dan klik Saya Sudah Bayar</li>
                 </ol>
               </div>
             </div>
+
+            <div className="relative aspect-[4/5] max-h-[430px] min-w-0 overflow-hidden border border-burgundy/10 bg-cream sm:max-h-none lg:col-start-1 lg:row-start-2">
+              <SafeImage
+                src={product.lifestyleImage}
+                alt={`${product.name} lifestyle styling`}
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+                fallbackLabel={`${product.name} lifestyle`}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-burgundy/10 bg-offwhite/95 px-4 py-3 shadow-[0_-12px_30px_rgba(32,20,18,0.12)] backdrop-blur md:hidden">
+          <div className="mx-auto flex max-w-md items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-semibold text-ink">{product.name}</p>
+              <p className="text-sm font-bold text-burgundy">{formatRupiah(product.price)}</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="min-h-11 shrink-0 bg-burgundy px-4 text-xs font-bold uppercase tracking-[0.08em] text-white"
+            >
+              Add To Cart
+            </button>
           </div>
         </div>
       </section>

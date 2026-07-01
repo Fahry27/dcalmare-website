@@ -2,9 +2,35 @@
 
 import { ShoppingBag, CreditCard, Truck, CheckCircle2, AlertCircle, Copy, Check } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function OrderTimeline({ order }: { order: any }) {
   const [copied, setCopied] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleReceiveOrder() {
+    if (!confirm("Apakah Anda yakin sudah menerima pesanan ini dengan baik?")) return;
+
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/orders/${order.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "complete-order" })
+      });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        alert("Gagal memperbarui status pesanan.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   function handleCopyResi() {
     if (order.trackingNumber) {
@@ -19,6 +45,7 @@ export default function OrderTimeline({ order }: { order: any }) {
 
   // Check step completion
   const step1Complete = true; // Always true once order exists
+  const isWaitingConfirmation = order.status === "WAITING_CONFIRMATION";
   const step2Complete = ["PAID", "SHIPPED", "COMPLETED"].includes(order.status);
   const step3Complete = ["SHIPPED", "COMPLETED"].includes(order.status);
   const step4Complete = order.status === "COMPLETED";
@@ -30,16 +57,18 @@ export default function OrderTimeline({ order }: { order: any }) {
       date: new Date(order.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
       icon: ShoppingBag,
       isCompleted: step1Complete,
-      isActive: order.status === "PENDING"
+      isActive: order.status === "PENDING" || isWaitingConfirmation
     },
     {
       title: "Pembayaran Lunas",
-      description: order.status === "PENDING" 
-        ? "Menunggu konfirmasi pembayaran otomatis via QRIS." 
-        : "Pembayaran telah berhasil kami terima.",
+      description: order.status === "PENDING"
+        ? "Menunggu pembayaran via QRIS."
+        : isWaitingConfirmation
+          ? "Pembayaran Anda sedang dicocokkan dengan mutasi masuk."
+          : "Pembayaran telah berhasil kami terima.",
       icon: CreditCard,
       isCompleted: step2Complete,
-      isActive: order.status === "PAID"
+      isActive: order.status === "PAID" || isWaitingConfirmation
     },
     {
       title: "Pesanan Dikirim",
@@ -127,6 +156,16 @@ export default function OrderTimeline({ order }: { order: any }) {
                         </button>
                       </div>
                     </div>
+                    {order.status === "SHIPPED" && (
+                      <button
+                        onClick={handleReceiveOrder}
+                        disabled={isLoading}
+                        className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 text-xs font-bold uppercase rounded-sm transition disabled:opacity-50 flex items-center justify-center gap-1"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        <span>Pesanan Diterima</span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

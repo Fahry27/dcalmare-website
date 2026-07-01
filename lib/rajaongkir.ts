@@ -1,4 +1,3 @@
-const RAJAONGKIR_API_KEY = process.env.RAJAONGKIR_API_KEY || "M1ukGguY273b877d949e37f5100Szp4Q";
 const ORIGIN_CITY_ID = "457"; // Tangerang Selatan (Tangsel)
 
 type RajaOngkirCostResponse = {
@@ -25,6 +24,10 @@ export async function getShippingCost(
   weightGrams: number = 1000
 ): Promise<number> {
   try {
+    if (!process.env.RAJAONGKIR_API_KEY) {
+      throw new Error("RAJAONGKIR_API_KEY is not configured");
+    }
+
     const params = new URLSearchParams();
     params.append("origin", ORIGIN_CITY_ID);
     params.append("destination", destinationCityId);
@@ -34,7 +37,7 @@ export async function getShippingCost(
     const res = await fetch("https://api.rajaongkir.com/starter/cost", {
       method: "POST",
       headers: {
-        "key": RAJAONGKIR_API_KEY,
+        "key": process.env.RAJAONGKIR_API_KEY,
         "content-type": "application/x-www-form-urlencoded"
       },
       body: params.toString()

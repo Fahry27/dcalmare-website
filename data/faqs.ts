@@ -17,17 +17,17 @@ export const faqs: FAQ[] = [
   {
     question: "Bagaimana cara memesan?",
     answer:
-      "Pilih produk, tentukan ukuran dan jumlah, klik lanjut ke pembayaran, isi detail pengiriman Anda, bayar menggunakan QR GoPay Merchant, lalu konfirmasi melalui WhatsApp."
+      "Pilih produk, tentukan ukuran dan jumlah, lanjut ke checkout sebagai tamu atau member, isi detail pengiriman, bayar dengan QRIS dinamis, lalu klik tombol Saya Sudah Bayar agar admin dapat mencocokkan pembayaran."
   },
   {
     question: "Metode pembayaran apa saja yang diterima?",
     answer:
-      "Untuk saat ini, pembayaran dilakukan secara manual melalui QR GoPay Merchant yang tertera di halaman checkout."
+      "Untuk saat ini, pembayaran dilakukan melalui QRIS dinamis di halaman checkout. Nominal dibuat unik agar pembayaran lebih mudah dicocokkan."
   },
   {
     question: "Bolehkah saya bayar dulu sebelum isi form?",
     answer:
-      "Mohon selesaikan pengisian form checkout di website terlebih dahulu agar ringkasan pesanan Anda tercatat. Setelah itu, silakan scan QR GoPay Merchant dan konfirmasi pesanan melalui WhatsApp."
+      "Mohon selesaikan form checkout terlebih dahulu agar ringkasan pesanan dan nominal QRIS tercatat dengan benar. Setelah membayar, klik Saya Sudah Bayar di halaman pembayaran."
   },
   {
     question: "Apakah saya bisa menukar ukuran?",
@@ -42,6 +42,6 @@ export const faqs: FAQ[] = [
   {
     question: "Apakah ada pembayaran otomatis via Midtrans?",
     answer:
-      "Belum ada. Pada versi awal ini, semua pembayaran dilakukan secara manual menggunakan QR GoPay Merchant dan konfirmasi melalui WhatsApp."
+      "Belum ada. Pada versi awal ini, pembayaran QRIS masih diverifikasi admin berdasarkan nominal unik. Integrasi payment gateway akan ditambahkan setelah akun pembayaran aktif."
   }
 ];

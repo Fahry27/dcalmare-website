@@ -1,9 +1,9 @@
 const steps = [
   "Choose your favorite first drop tee.",
   "Select size and quantity on the product page.",
-  "Fill your delivery details at checkout.",
-  "Scan the GoPay Merchant QR and complete payment.",
-  "Confirm your paid order to dCalmare via WhatsApp."
+  "Checkout as guest or member.",
+  "Scan the dynamic QRIS and pay the exact amount.",
+  "Tap Saya Sudah Bayar so admin can verify your payment."
 ];
 
 export default function HowToOrder() {
@@ -15,7 +15,7 @@ export default function HowToOrder() {
             How To Order
           </p>
           <h2 className="mt-4 break-words font-serif text-3xl font-semibold leading-tight text-ink min-[360px]:text-4xl md:text-5xl">
-            Checkout first. WhatsApp after payment.
+            Checkout fast. Pay with QRIS.
           </h2>
         </div>
         <div className="mt-8 grid min-w-0 gap-4 md:mt-10 md:grid-cols-5">

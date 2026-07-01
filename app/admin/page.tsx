@@ -1,17 +1,14 @@
 import prisma from "@/lib/prisma";
 import OrderRow from "./OrderRow";
-import { cookies } from "next/headers";
 import AdminLogin from "./AdminLogin";
+import { getAdminSession } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("admin_token")?.value;
-  
-  const validTokens = ["admin_dewa_auth_token", "admin_fahry_auth_token"];
+  const adminSession = await getAdminSession();
 
-  if (!token || !validTokens.includes(token)) {
+  if (!adminSession) {
     return <AdminLogin />;
   }
 

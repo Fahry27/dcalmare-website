@@ -81,12 +81,18 @@ export default async function TrackingPage() {
                     ))}
                   </div>
                   
-                  {order.status === "PENDING" && (
+                  {(order.status === "PENDING" || order.status === "WAITING_CONFIRMATION") && (
                     <div className="mt-6 pt-6 border-t border-burgundy/10 text-center">
-                      <p className="text-sm text-muted mb-3">Pesanan Anda sedang menunggu pembayaran.</p>
-                      <Link href={`/checkout?product=continue`} className="inline-block bg-burgundy text-white px-6 py-2 text-sm font-semibold uppercase tracking-widest hover:bg-burgundy-dark transition">
-                        Selesaikan Pembayaran
-                      </Link>
+                      <p className="text-sm text-muted mb-3">
+                        {order.status === "WAITING_CONFIRMATION"
+                          ? "Pembayaran sedang dicocokkan dengan mutasi masuk."
+                          : "Pesanan Anda sedang menunggu pembayaran."}
+                      </p>
+                      {order.status === "PENDING" ? (
+                        <Link href={`/checkout?product=continue`} className="inline-block bg-burgundy text-white px-6 py-2 text-sm font-semibold uppercase tracking-widest hover:bg-burgundy-dark transition">
+                          Selesaikan Pembayaran
+                        </Link>
+                      ) : null}
                     </div>
                   )}
                 </div>

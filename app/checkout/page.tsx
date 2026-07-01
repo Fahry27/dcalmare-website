@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import CheckoutForm from "@/components/CheckoutForm";
-import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Checkout",
   description:
-    "Complete your dCalmare order, pay manually with GoPay Merchant QR, and confirm through WhatsApp after payment."
+    "Complete your dCalmare order, pay with dynamic QRIS, and confirm payment for admin verification."
 };
 
 export default async function CheckoutPage() {
   const session = await getSession();
-  
-  if (!session) {
-    redirect("/login?redirect=/checkout");
-  }
 
   return (
     <Suspense

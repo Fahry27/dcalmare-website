@@ -58,10 +58,11 @@ export default function OrderRow({ order }: { order: any }) {
             order.status === "PAID" ? "bg-green-100 text-green-800" : 
             order.status === "SHIPPED" ? "bg-blue-100 text-blue-800" :
             order.status === "COMPLETED" ? "bg-teal-100 text-teal-800" :
+            order.status === "WAITING_CONFIRMATION" ? "bg-orange-100 text-orange-800" :
             order.status === "PENDING" ? "bg-yellow-100 text-yellow-800" : 
             "bg-red-100 text-red-800"
           }`}>
-            {order.status}
+            {order.status === "WAITING_CONFIRMATION" ? "CEK MUTASI" : order.status}
           </span>
         </td>
         <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>

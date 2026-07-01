@@ -7,6 +7,7 @@ import HowToOrder from "@/components/HowToOrder";
 import ProductGrid from "@/components/ProductGrid";
 import SafeImage from "@/components/SafeImage";
 import prisma from "@/lib/prisma";
+import { publicProductWhere } from "@/lib/product-visibility";
 
 export const metadata: Metadata = {
   title: "dCalmare | One summer can change everything",
@@ -14,8 +15,11 @@ export const metadata: Metadata = {
     "Shop dCalmare's first drop of summer-inspired oversized white graphic tees."
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const products = await prisma.product.findMany({
+    where: publicProductWhere,
     orderBy: { createdAt: "asc" }
   });
   const highlightedProduct = products[0];

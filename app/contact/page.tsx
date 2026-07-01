@@ -17,9 +17,9 @@ export default function ContactPage() {
             Need help with your order?
           </h1>
           <p className="mt-5 text-base leading-relaxed text-muted md:leading-8">
-            Reach dCalmare through these placeholder channels. For order flow,
-            please checkout on the website before confirming payment via
-            WhatsApp.
+            Reach dCalmare through the channels below. For orders, please
+            checkout on the website first so your items, shipping address, and
+            QRIS payment amount are recorded correctly.
           </p>
         </div>
         <div className="grid min-w-0 gap-4">

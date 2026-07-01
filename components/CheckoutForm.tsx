@@ -8,6 +8,7 @@ import { formatRupiah } from "@/lib/utils";
 import { QRCodeSVG } from "qrcode.react";
 import { useCartStore } from "@/store/useCartStore";
 import SafeImage from "./SafeImage";
+import { Check, Clock3, Copy, CreditCard, ShieldCheck, Timer } from "lucide-react";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 
@@ -70,7 +71,8 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [orderState, setOrderState] = useState<{ id: string; qrisString: string; status: string; amount: number } | null>(null);
+  const [copiedValue, setCopiedValue] = useState<"order" | "qris" | null>(null);
+  const [orderState, setOrderState] = useState<{ id: string; qrisString: string; status: string; amount: number; baseAmount?: number; uniqueCode?: number } | null>(null);
 
   const isFormComplete = useMemo(
     () =>
@@ -156,7 +158,9 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
           id: data.orderId,
           qrisString: data.qrisString,
           status: "PENDING",
-          amount: data.amount
+          amount: data.amount,
+          baseAmount: data.baseAmount,
+          uniqueCode: data.uniqueCode
         });
         clearCart(); // Clear cart after order is created successfully
       } else {
@@ -170,18 +174,55 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
     }
   }
 
+  async function confirmPayment() {
+    if (!orderState) return;
+
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/orders/${orderState.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "confirm-payment" })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setOrderState((prev) => prev ? { ...prev, status: data.status || "WAITING_CONFIRMATION" } : null);
+      } else {
+        alert("Konfirmasi pembayaran gagal diproses.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan sistem.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function copyToClipboard(value: string, type: "order" | "qris") {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedValue(type);
+      setTimeout(() => setCopiedValue(null), 1800);
+    } catch (err) {
+      console.error("Failed to copy payment data", err);
+      alert("Gagal menyalin. Silakan salin manual.");
+    }
+  }
+
   // Polling for order status
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (orderState && orderState.status === "PENDING") {
+    if (orderState && ["PENDING", "WAITING_CONFIRMATION"].includes(orderState.status)) {
       interval = setInterval(async () => {
         try {
           const res = await fetch(`/api/orders/${orderState.id}`);
           if (res.ok) {
             const data = await res.json();
-            if (data.status !== "PENDING") {
+            if (data.status !== orderState.status) {
               setOrderState(prev => prev ? { ...prev, status: data.status } : null);
-              clearInterval(interval);
+              if (!["PENDING", "WAITING_CONFIRMATION"].includes(data.status)) {
+                clearInterval(interval);
+              }
             }
           }
         } catch (err) {
@@ -260,30 +301,147 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
       );
     }
 
+    const isWaitingConfirmation = orderState.status === "WAITING_CONFIRMATION";
+
     return (
       <section className="bg-offwhite py-8 md:py-16">
         <div className="container-pad">
-          <div className="mx-auto max-w-xl border border-burgundy/12 bg-white p-6 sm:p-10 text-center">
-            <h1 className="break-words font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl mb-4">
-              Selesaikan Pembayaran
-            </h1>
-            <p className="text-muted mb-8">
-              Silakan scan QRIS di bawah ini menggunakan aplikasi m-banking atau e-wallet (GoPay, OVO, Dana, dll).
-            </p>
-            <div className="bg-white p-4 border border-burgundy/15 rounded-lg inline-block shadow-sm">
-              <QRCodeSVG value={orderState.qrisString} size={256} className="mx-auto" />
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-6 flex flex-col gap-3 border-b border-burgundy/10 pb-5 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-burgundy sm:tracking-[0.24em]">
+                  Pembayaran QRIS
+                </p>
+                <h1 className="mt-3 break-words font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl md:text-5xl">
+                  Selesaikan pembayaran.
+                </h1>
+              </div>
+              <div className="inline-flex w-fit items-center gap-2 border border-burgundy/10 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
+                {isWaitingConfirmation ? <ShieldCheck className="h-4 w-4 text-burgundy" /> : <Clock3 className="h-4 w-4 text-burgundy" />}
+                {isWaitingConfirmation ? "Menunggu Verifikasi" : "Menunggu Pembayaran"}
+              </div>
             </div>
-            <p className="mt-6 text-xl font-bold text-burgundy">{formatRupiah(orderState.amount)}</p>
-            <div className="mt-8 flex items-center justify-center gap-3 text-sm text-muted">
-              <svg className="animate-spin h-5 w-5 text-burgundy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Menunggu konfirmasi pembayaran...
+
+            <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+              <div className="border border-burgundy/12 bg-white p-5 sm:p-7">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-full max-w-sm border border-burgundy/10 bg-offwhite p-4 sm:p-5">
+                    <div className="bg-white p-3">
+                      <QRCodeSVG value={orderState.qrisString} size={280} className="mx-auto h-auto max-w-full" />
+                    </div>
+                  </div>
+
+                  <div className="mt-6 w-full max-w-md">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
+                      Total yang harus dibayar
+                    </p>
+                    <p className="mt-2 break-words font-serif text-4xl font-semibold leading-tight text-burgundy sm:text-5xl">
+                      {formatRupiah(orderState.amount)}
+                    </p>
+                    {orderState.baseAmount && orderState.uniqueCode ? (
+                      <div className="mt-4 grid gap-2 border border-yellow-200 bg-yellow-50 p-4 text-left text-xs leading-relaxed text-yellow-900 sm:grid-cols-2">
+                        <div>
+                          <p className="font-semibold uppercase tracking-[0.12em]">Subtotal</p>
+                          <p className="mt-1 font-bold">{formatRupiah(orderState.baseAmount)}</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold uppercase tracking-[0.12em]">Kode Unik</p>
+                          <p className="mt-1 font-bold">+{orderState.uniqueCode}</p>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-6 flex w-full max-w-md flex-col gap-3 sm:flex-row">
+                    {orderState.status === "PENDING" ? (
+                      <button
+                        type="button"
+                        onClick={confirmPayment}
+                        disabled={isLoading}
+                        className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 bg-burgundy px-5 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-burgundy-dark disabled:cursor-not-allowed disabled:bg-muted/40"
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        {isLoading ? "Memproses..." : "Saya Sudah Bayar"}
+                      </button>
+                    ) : (
+                      <div className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 border border-burgundy/15 bg-cream/30 px-5 text-center text-sm font-semibold uppercase tracking-[0.08em] text-burgundy">
+                        <ShieldCheck className="h-4 w-4" />
+                        Sedang Dicek Admin
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(orderState.qrisString, "qris")}
+                      className="inline-flex min-h-12 items-center justify-center gap-2 border border-burgundy/15 bg-white px-5 text-sm font-semibold uppercase tracking-[0.08em] text-ink transition hover:border-burgundy hover:text-burgundy"
+                    >
+                      {copiedValue === "qris" ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                      {copiedValue === "qris" ? "Tersalin" : "Salin QRIS"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <aside className="grid gap-4">
+                <div className="border border-burgundy/12 bg-white p-5 sm:p-6">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-burgundy text-white">
+                      <Timer className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h2 className="font-serif text-2xl font-semibold leading-tight text-ink">
+                        Instruksi
+                      </h2>
+                      <p className="mt-2 text-sm leading-relaxed text-muted">
+                        Scan QRIS, bayar sesuai nominal unik, lalu tekan tombol konfirmasi setelah pembayaran berhasil dari aplikasi Anda.
+                      </p>
+                    </div>
+                  </div>
+
+                  <ol className="mt-5 grid gap-3 text-sm text-ink">
+                    {["Buka m-banking atau e-wallet yang mendukung QRIS.", "Scan kode QR dan pastikan nominal sama persis.", "Simpan bukti pembayaran sampai status berubah lunas."].map((step, index) => (
+                      <li key={step} className="flex gap-3 border-t border-burgundy/10 pt-3 first:border-t-0 first:pt-0">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center bg-cream text-xs font-bold text-burgundy">
+                          {index + 1}
+                        </span>
+                        <span className="leading-relaxed text-muted">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                <div className="border border-burgundy/12 bg-white p-5 sm:p-6">
+                  <h2 className="font-serif text-2xl font-semibold leading-tight text-ink">
+                    Detail Pesanan
+                  </h2>
+                  <dl className="mt-5 grid gap-3 text-sm">
+                    <div className="flex items-center justify-between gap-3 border-b border-burgundy/10 pb-3">
+                      <dt className="text-muted">Order ID</dt>
+                      <dd className="flex min-w-0 items-center gap-2 font-mono text-xs font-bold text-ink">
+                        <span className="truncate">{orderState.id}</span>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(orderState.id, "order")}
+                          className="shrink-0 p-1 text-muted transition hover:text-burgundy"
+                          title="Salin Order ID"
+                        >
+                          {copiedValue === "order" ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-3 border-b border-burgundy/10 pb-3">
+                      <dt className="text-muted">Status</dt>
+                      <dd className="font-semibold text-burgundy">
+                        {isWaitingConfirmation ? "Cek mutasi admin" : "Belum dikonfirmasi"}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-muted">Metode</dt>
+                      <dd className="font-semibold text-ink">QRIS Dinamis</dd>
+                    </div>
+                  </dl>
+                </div>
+              </aside>
             </div>
-            <p className="mt-4 text-xs text-muted/80">
-              Order ID: {orderState.id}
-            </p>
           </div>
         </div>
       </section>
@@ -301,7 +459,7 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
             Selesaikan pesanan.
           </h1>
           <p className="mt-5 text-base leading-relaxed text-muted md:leading-8">
-            Isi detail pengiriman untuk memproses pesanan dan membuat kode QR pembayaran otomatis.
+            Isi detail pengiriman untuk memproses pesanan dan membuat QRIS dinamis sesuai total pembayaran.
           </p>
         </div>
 

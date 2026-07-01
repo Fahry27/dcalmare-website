@@ -37,10 +37,11 @@ export default function ShopFilter() {
   };
 
   return (
-    <div className="mb-8 flex flex-col gap-4 border-y border-burgundy/10 py-4 md:flex-row md:items-center md:justify-between">
-      <form onSubmit={handleSearch} className="relative flex-1 max-w-sm">
+    <div className="mb-6 flex flex-col gap-3 border-y border-burgundy/10 py-3 md:mb-8 md:flex-row md:items-center md:justify-between md:py-4">
+      <form onSubmit={handleSearch} className="relative flex-1 md:max-w-sm">
         <input
           type="text"
+          aria-label="Cari koleksi"
           placeholder="Cari koleksi..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -49,13 +50,15 @@ export default function ShopFilter() {
         <button
           type="submit"
           className="absolute right-0 top-0 bottom-0 px-3 text-burgundy/50 hover:text-burgundy transition"
+          aria-label="Cari produk"
         >
           <Search className="w-4 h-4" />
         </button>
       </form>
 
-      <div className="flex gap-4">
+      <div className="grid grid-cols-2 gap-3 md:flex md:gap-4">
         <select
+          aria-label="Filter kategori"
           onChange={handleCategoryChange}
           defaultValue={searchParams.get("category") || ""}
           className="border border-burgundy/20 bg-white py-2.5 px-3 text-sm outline-none focus:border-burgundy text-ink"
@@ -67,6 +70,7 @@ export default function ShopFilter() {
         </select>
 
         <select
+          aria-label="Urutkan produk"
           onChange={handleSortChange}
           defaultValue={searchParams.get("sort") || ""}
           className="border border-burgundy/20 bg-white py-2.5 px-3 text-sm outline-none focus:border-burgundy text-ink"

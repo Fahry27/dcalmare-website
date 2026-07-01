@@ -52,8 +52,8 @@ export default function OrderActions({ orderId, currentStatus }: { orderId: stri
 
   return (
     <div className="flex gap-1.5 flex-wrap justify-end">
-      {/* PENDING -> PAID */}
-      {currentStatus === "PENDING" && (
+      {/* PENDING / WAITING_CONFIRMATION -> PAID */}
+      {(currentStatus === "PENDING" || currentStatus === "WAITING_CONFIRMATION") && (
         <>
           <button
             onClick={() => updateStatus("PAID")}

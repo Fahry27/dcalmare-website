@@ -1,19 +1,24 @@
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET || "dcalmare-secret-key-super-safe");
+function getJwtSecret() {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET must be configured.");
+  }
+  return new TextEncoder().encode(process.env.JWT_SECRET);
+}
 
 export async function signToken(payload: any) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(secret);
+    .sign(getJwtSecret());
 }
 
 export async function verifyToken(token: string) {
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     return payload;
   } catch (error) {
     return null;

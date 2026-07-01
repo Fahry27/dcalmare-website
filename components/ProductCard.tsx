@@ -21,7 +21,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             alt={product.name}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-contain p-5 transition duration-500 group-hover:scale-[1.03] sm:p-7"
+            className="object-contain p-3 transition duration-500 group-hover:scale-[1.03] sm:p-7"
             fallbackLabel={product.name}
           />
           <div className="absolute left-3 right-3 top-3 flex items-start justify-between sm:left-4 sm:right-4 sm:top-4">
@@ -44,18 +44,18 @@ export default function ProductCard({ product }: ProductCardProps) {
             />
           </div>
         </div>
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <p className="break-words text-xs font-semibold uppercase tracking-[0.16em] text-burgundy sm:tracking-[0.18em]">
+      <div className="flex flex-1 flex-col p-3 sm:p-5">
+        <p className="break-words text-[10px] font-semibold uppercase tracking-[0.12em] text-burgundy sm:text-xs sm:tracking-[0.18em]">
           {product.category}
         </p>
-        <h3 className="mt-3 break-words font-serif text-2xl font-semibold leading-tight text-ink">
+        <h3 className="mt-2 break-words font-serif text-lg font-semibold leading-tight text-ink sm:mt-3 sm:text-2xl">
           {product.name}
         </h3>
         <p className="mt-2 text-sm font-semibold text-muted">
           {formatRupiah(product.price)}
         </p>
-        <span className="mt-6 inline-flex min-h-11 w-full items-center justify-center border border-burgundy px-5 text-sm font-semibold uppercase tracking-[0.12em] text-burgundy transition group-hover:bg-burgundy group-hover:text-white group-focus-visible:outline-none group-focus-visible:ring-2 group-focus-visible:ring-burgundy group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-white sm:tracking-[0.16em]">
-          View Details
+        <span className="mt-4 inline-flex min-h-10 w-full items-center justify-center border border-burgundy px-3 text-xs font-semibold uppercase tracking-[0.08em] text-burgundy transition group-hover:bg-burgundy group-hover:text-white group-focus-visible:outline-none group-focus-visible:ring-2 group-focus-visible:ring-burgundy group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-white sm:mt-6 sm:min-h-11 sm:px-5 sm:text-sm sm:tracking-[0.16em]">
+          Pilih Produk
         </span>
       </div>
       </article>
