@@ -48,8 +48,13 @@ export async function POST(request: Request) {
     });
 
     // Generate Dynamic QRIS
-    const dynamicQrisResult = generateDynamicQris(STATIC_QRIS, { amount });
-    const dynamicQrisString = dynamicQrisResult.payload;
+    let dynamicQrisString = STATIC_QRIS;
+    try {
+      const dynamicQrisResult = generateDynamicQris(STATIC_QRIS, { amount });
+      dynamicQrisString = dynamicQrisResult.payload;
+    } catch (e) {
+      console.warn("Failed to generate dynamic QRIS, falling back to static");
+    }
 
     // Update order with the qris string
     await prisma.order.update({
