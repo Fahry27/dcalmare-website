@@ -4,9 +4,9 @@ export default function Footer() {
   return (
     <footer className="bg-burgundy-dark text-offwhite w-full overflow-hidden border-t border-burgundy/20">
       <div className="container-pad py-16 md:py-24">
-        <div className="flex flex-col md:flex-row md:justify-between gap-12">
+        <div className="grid gap-12 md:grid-cols-4">
           
-          <div className="max-w-sm">
+          <div className="md:col-span-2 max-w-sm">
             <Link href="/" className="inline-flex items-center font-serif text-4xl font-semibold tracking-wide hover:text-cream transition-colors">
               dCalmare
             </Link>
@@ -16,42 +16,40 @@ export default function Footer() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-12 sm:gap-24">
-            <div>
-              <h2 className="text-xs font-bold uppercase tracking-[0.25em] text-cream mb-6">
-                Explore
-              </h2>
-              <div className="flex flex-col gap-4 text-sm text-offwhite/80">
-                <Link href="/shop" className="hover:text-white transition-colors">
-                  Shop
-                </Link>
-                <Link href="/about" className="hover:text-white transition-colors">
-                  About
-                </Link>
-                <Link href="/size-guide" className="hover:text-white transition-colors">
-                  Size Guide
-                </Link>
-                <Link href="/faq" className="hover:text-white transition-colors">
-                  FAQ
-                </Link>
-              </div>
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-[0.25em] text-cream mb-6">
+              Explore
+            </h2>
+            <div className="flex flex-col gap-4 text-sm text-offwhite/80">
+              <Link href="/shop" className="hover:text-white transition-colors">
+                Shop
+              </Link>
+              <Link href="/about" className="hover:text-white transition-colors">
+                About
+              </Link>
+              <Link href="/size-guide" className="hover:text-white transition-colors">
+                Size Guide
+              </Link>
+              <Link href="/faq" className="hover:text-white transition-colors">
+                FAQ
+              </Link>
             </div>
+          </div>
 
-            <div>
-              <h2 className="text-xs font-bold uppercase tracking-[0.25em] text-cream mb-6">
-                Contact
-              </h2>
-              <div className="flex flex-col gap-4 text-sm text-offwhite/80">
-                <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                  WhatsApp: +62 812-3456-7890
-                </a>
-                <a href="https://instagram.com/dcalmare" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
-                  Instagram: @dcalmare
-                </a>
-                <a href="mailto:hello@dcalmare.com" className="hover:text-white transition-colors">
-                  Email: hello@dcalmare.com
-                </a>
-              </div>
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-[0.25em] text-cream mb-6">
+              Contact
+            </h2>
+            <div className="flex flex-col gap-4 text-sm text-offwhite/80">
+              <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+                WhatsApp: +62 812-3456-7890
+              </a>
+              <a href="https://instagram.com/dcalmare" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+                Instagram: @dcalmare
+              </a>
+              <a href="mailto:hello@dcalmare.com" className="hover:text-white transition-colors">
+                Email: hello@dcalmare.com
+              </a>
             </div>
           </div>
 

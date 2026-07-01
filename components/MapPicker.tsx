@@ -107,8 +107,7 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
     }
   }, []);
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSearch() {
     if (!searchQuery.trim()) return;
     
     setIsSearching(true);
@@ -138,22 +137,29 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
 
   return (
     <div className="relative h-[400px] w-full border border-burgundy/15 z-0 flex flex-col">
-      <form onSubmit={handleSearch} className="absolute top-2 left-2 right-2 z-[400] flex gap-2">
+      <div className="absolute top-2 left-2 right-2 z-[400] flex gap-2">
         <input 
           type="text" 
           placeholder="Cari jalan, kecamatan, atau kota..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault(); // Mencegah form checkout tersubmit
+              handleSearch();
+            }
+          }}
           className="flex-1 min-h-10 px-3 py-2 text-sm border border-burgundy/20 bg-white/95 shadow-sm outline-none focus:border-burgundy rounded-sm"
         />
         <button 
-          type="submit" 
+          type="button" 
+          onClick={handleSearch}
           disabled={isSearching}
           className="min-h-10 px-4 bg-burgundy text-white text-sm font-semibold rounded-sm shadow-sm hover:bg-burgundy-dark transition-colors disabled:opacity-70"
         >
           {isSearching ? "Mencari..." : "Cari"}
         </button>
-      </form>
+      </div>
       
       <MapContainer 
         center={position} 

@@ -12,8 +12,10 @@
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@shamah/dynamic-qris": "^0.1.1",
+    "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
+    "jose": "^6.2.3",
     "leaflet": "^1.9.4",
     "next": "^15.3.4",
     "qrcode.react": "^4.2.0",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
+    "@types/bcryptjs": "^2.4.6",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^24.0.10",
     "@types/react": "^19.1.8",

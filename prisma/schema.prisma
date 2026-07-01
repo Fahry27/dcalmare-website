@@ -7,13 +7,22 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model Customer {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  name      String
+  phone     String
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Order {
   id              String   @id @default(cuid())
   customerName    String
   customerPhone   String
   customerAddress String?
-  customerCity    String?
-  customerPostal  String?
   customerNotes   String?
   productSlug     String
   productSize     String
@@ -21,6 +30,10 @@ model Order {
   amount          Int
   status          String   @default("PENDING") // PENDING, PAID, CANCELLED
   qrisString      String?  // The dynamic QRIS payload generated for this order
+  
+  customerId      String?
+  customer        Customer? @relation(fields: [customerId], references: [id])
+  
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
