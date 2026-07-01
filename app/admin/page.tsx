@@ -9,9 +9,10 @@ export const dynamic = "force-dynamic";
 export default async function AdminDashboard() {
   const cookieStore = await cookies();
   const token = cookieStore.get("admin_token")?.value;
-  const correctPassword = process.env.ADMIN_PASSWORD || "dcalmare123";
+  
+  const validTokens = ["admin_dewa_auth_token", "admin_fahry_auth_token"];
 
-  if (token !== correctPassword) {
+  if (!token || !validTokens.includes(token)) {
     return <AdminLogin />;
   }
 

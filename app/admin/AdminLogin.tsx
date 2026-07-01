@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Lock } from "lucide-react";
 
 export default function AdminLogin() {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const res = await loginAdmin(password);
+      const res = await loginAdmin(username, password);
       if (res.success) {
         router.refresh();
       } else {
@@ -43,6 +44,14 @@ export default function AdminLogin() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+              className="mb-3 min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base outline-none transition focus:border-burgundy"
+              required
+            />
             <input
               type="password"
               value={password}

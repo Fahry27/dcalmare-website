@@ -2,12 +2,17 @@
 
 import { cookies } from "next/headers";
 
-export async function loginAdmin(password: string) {
-  const correctPassword = process.env.ADMIN_PASSWORD || "dcalmare123";
+export async function loginAdmin(username: string, password: string) {
+  const adminAccounts = [
+    { user: "dewa", pass: "dewa_admin2026", token: "admin_dewa_auth_token" },
+    { user: "fahry", pass: "fahry_admin2026", token: "admin_fahry_auth_token" }
+  ];
   
-  if (password === correctPassword) {
+  const account = adminAccounts.find(a => a.user === username.toLowerCase() && a.pass === password);
+  
+  if (account) {
     const cookieStore = await cookies();
-    cookieStore.set("admin_token", password, {
+    cookieStore.set("admin_token", account.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
@@ -16,7 +21,7 @@ export async function loginAdmin(password: string) {
     return { success: true };
   }
   
-  return { success: false, error: "Password salah!" };
+  return { success: false, error: "Username atau password salah!" };
 }
 
 export async function logoutAdmin() {
