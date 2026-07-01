@@ -37,8 +37,11 @@ export const metadata: Metadata = {
   }
 };
 
+import AnimatePage from "@/components/AnimatePage";
+import CartDrawer from "@/components/CartDrawer";
+
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
@@ -46,8 +49,11 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="flex min-h-screen flex-col bg-offwhite text-ink antialiased">
         <Navbar />
-        <main className="flex-1 flex flex-col">{children}</main>
+        <main className="flex-1 flex flex-col">
+          <AnimatePage>{children}</AnimatePage>
+        </main>
         <Footer />
+        <CartDrawer />
       </body>
     </html>
   );

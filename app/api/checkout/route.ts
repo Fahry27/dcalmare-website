@@ -11,14 +11,25 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { 
       fullName, whatsapp, address, notes,
-      productSlug, selectedSize, quantity
+      items
     } = body;
 
-    const product = getProductBySlug(productSlug);
-    if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    
-    const amount = product.price * quantity;
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+    }
+
+    const amount = items.reduce((total: number, item: any) => total + (item.price * item.quantity), 0);
+    const totalQuantity = items.reduce((total: number, item: any) => total + item.quantity, 0);
     const session = await getSession();
+
+    // Serialize items into productSlug since we haven't migrated the schema to support OrderItems
+    const serializedItems = JSON.stringify(items.map((i: any) => ({
+      slug: i.productSlug,
+      name: i.productName,
+      size: i.size,
+      qty: i.quantity,
+      price: i.price
+    })));
 
     // Create the order in database
     const order = await prisma.order.create({
@@ -27,9 +38,9 @@ export async function POST(request: Request) {
         customerPhone: whatsapp,
         customerAddress: address,
         customerNotes: notes,
-        productSlug,
-        productSize: selectedSize,
-        quantity,
+        productSlug: serializedItems,
+        productSize: "MULTIPLE",
+        quantity: totalQuantity,
         amount,
         customerId: session?.id || null,
         status: "PENDING",

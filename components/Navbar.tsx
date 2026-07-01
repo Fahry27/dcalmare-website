@@ -4,6 +4,28 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import SafeImage from "@/components/SafeImage";
 import { cn } from "@/lib/utils";
+import { ShoppingBag } from "lucide-react";
+import { useCartStore } from "@/store/useCartStore";
+
+function CartBadge() {
+  const [mounted, setMounted] = useState(false);
+  const getTotalItems = useCartStore((state) => state.getTotalItems);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+  const count = getTotalItems();
+  
+  if (count === 0) return null;
+
+  return (
+    <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-burgundy text-[9px] font-bold text-white">
+      {count}
+    </span>
+  );
+}
 
 const navItems = [
   { href: "/shop", label: "Shop" },
@@ -63,6 +85,15 @@ export default function Navbar() {
               Login
             </Link>
           )}
+
+          <button
+            onClick={() => useCartStore.getState().setIsOpen(true)}
+            className="relative inline-flex h-11 w-11 shrink-0 items-center justify-center text-burgundy transition hover:bg-burgundy/5"
+            aria-label="Open cart"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            <CartBadge />
+          </button>
 
           <button
             type="button"

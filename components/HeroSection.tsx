@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SafeImage from "@/components/SafeImage";
+import ScrollReveal from "@/components/ScrollReveal";
 
 export default function HeroSection() {
   return (
@@ -8,7 +9,7 @@ export default function HeroSection() {
       style={{ backgroundImage: "url('/brand/burgundy-texture.jpg')" }}
     >
       <div className="container-pad grid min-h-[calc(100svh-4rem)] items-center gap-8 py-12 md:min-h-[calc(100svh-5rem)] md:grid-cols-[1.15fr_0.85fr] md:gap-10 md:py-20">
-        <div className="min-w-0">
+        <ScrollReveal className="min-w-0">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-cream sm:tracking-[0.26em]">
             First Drop / Graphic Tees
           </p>
@@ -25,9 +26,9 @@ export default function HeroSection() {
           >
             Shop The First Drop
           </Link>
-        </div>
+        </ScrollReveal>
 
-        <div className="relative aspect-[4/5] max-h-[430px] min-w-0 overflow-hidden border border-white/15 bg-burgundy-dark/35 md:max-h-none">
+        <ScrollReveal delay={0.2} className="relative aspect-[4/5] max-h-[430px] min-w-0 overflow-hidden border border-white/15 bg-burgundy-dark/35 md:max-h-none">
           <SafeImage
             src="/products/bottle-collection-tee-lifestyle.jpg"
             alt="dCalmare first drop styled outfit"
@@ -37,7 +38,7 @@ export default function HeroSection() {
             className="object-cover"
             fallbackLabel="dCalmare First Drop"
           />
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

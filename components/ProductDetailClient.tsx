@@ -8,6 +8,7 @@ import type { Product } from "@/data/products";
 import { products } from "@/data/products";
 import { clampQuantity, cn, formatRupiah } from "@/lib/utils";
 import ProductCard from "@/components/ProductCard";
+import { useCartStore } from "@/store/useCartStore";
 
 type ProductDetailClientProps = {
   product: Product;
@@ -15,6 +16,7 @@ type ProductDetailClientProps = {
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const router = useRouter();
+  const addItem = useCartStore((state) => state.addItem);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [showSizeError, setShowSizeError] = useState(false);
@@ -28,19 +30,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     setQuantity(clampQuantity(nextQuantity));
   }
 
-  function continueToCheckout() {
+  function handleAddToCart() {
     if (!selectedSize) {
       setShowSizeError(true);
       return;
     }
-
-    const params = new URLSearchParams({
-      product: product.slug,
-      size: selectedSize,
-      qty: String(quantity)
-    });
-
-    router.push(`/checkout?${params.toString()}`);
+    
+    addItem(product, selectedSize, quantity);
   }
 
   return (
@@ -188,10 +184,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
               <button
                 type="button"
-                onClick={continueToCheckout}
+                onClick={handleAddToCart}
                 className="mt-8 flex min-h-14 w-full items-center justify-center bg-burgundy px-4 text-center text-sm font-semibold uppercase leading-5 tracking-[0.08em] text-white transition hover:bg-burgundy-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy focus-visible:ring-offset-2 focus-visible:ring-offset-offwhite sm:px-6 sm:tracking-[0.18em]"
               >
-                Lanjut ke Pembayaran
+                Add to Cart
               </button>
               
               <p className="mt-4 text-center text-xs text-muted">

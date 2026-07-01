@@ -1,10 +1,20 @@
 import prisma from "@/lib/prisma";
 import OrderActions from "./OrderActions";
 import { formatRupiah } from "@/lib/utils";
+import { cookies } from "next/headers";
+import AdminLogin from "./AdminLogin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("admin_token")?.value;
+  const correctPassword = process.env.ADMIN_PASSWORD || "dcalmare123";
+
+  if (token !== correctPassword) {
+    return <AdminLogin />;
+  }
+
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: "desc" }
   });

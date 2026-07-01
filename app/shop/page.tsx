@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import ProductGrid from "@/components/ProductGrid";
+import ScrollReveal from "@/components/ScrollReveal";
+import ProductCard from "@/components/ProductCard";
+import { products } from "@/data/products";
 
 export const metadata: Metadata = {
   title: "Shop First Drop",
@@ -23,7 +26,13 @@ export default function ShopPage() {
           </p>
         </div>
         <div className="mt-8 md:mt-10">
-          <ProductGrid />
+          <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-4">
+            {products.map((product, index) => (
+              <ScrollReveal key={product.id} delay={index * 0.1}>
+                <ProductCard product={product} />
+              </ScrollReveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>

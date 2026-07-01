@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { getProductBySlug } from "@/data/products";
 import { formatRupiah } from "@/lib/utils";
 import { QRCodeSVG } from "qrcode.react";
+import { useCartStore } from "@/store/useCartStore";
+import SafeImage from "./SafeImage";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 
@@ -17,21 +18,6 @@ type CheckoutFields = {
   manualAddress: string;
   notes: string;
 };
-
-const initialFields: CheckoutFields = {
-  fullName: "",
-  whatsapp: "",
-  address: "",
-  manualAddress: "",
-  notes: ""
-};
-
-function parseCheckoutQuantity(value: string | null) {
-  if (!value) return null;
-  const quantity = Number(value);
-  if (!Number.isInteger(quantity) || quantity < 1) return null;
-  return quantity;
-}
 
 function CheckoutErrorState({ title, message }: { title: string; message: string; }) {
   return (
@@ -59,7 +45,15 @@ function CheckoutErrorState({ title, message }: { title: string; message: string
 
 export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  
+  // Hydration safety for zustand
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const cartItems = useCartStore((state) => state.items);
+  const cartTotal = useCartStore((state) => state.getTotalPrice());
+  const clearCart = useCartStore((state) => state.clearCart);
+
   const [fields, setFields] = useState<CheckoutFields>({
     fullName: initialUser?.name || "",
     whatsapp: initialUser?.phone || "",
@@ -69,12 +63,6 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [orderState, setOrderState] = useState<{ id: string; qrisString: string; status: string } | null>(null);
-
-  const productSlug = (searchParams.get("product") ?? "").trim();
-  const selectedSize = (searchParams.get("size") ?? "").trim().toUpperCase();
-  const quantity = parseCheckoutQuantity(searchParams.get("qty"));
-  const product = productSlug ? getProductBySlug(productSlug) : undefined;
-  const total = product && quantity ? product.price * quantity : 0;
 
   const isFormComplete = useMemo(
     () =>
@@ -96,7 +84,7 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
 
   async function createOrder(e: React.FormEvent) {
     e.preventDefault();
-    if (!isFormComplete || !product || !quantity) return;
+    if (!isFormComplete || cartItems.length === 0) return;
     
     setIsLoading(true);
     const finalAddress = `${fields.manualAddress}\n\n(Area dari Peta: ${fields.address})`;
@@ -108,9 +96,13 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
         body: JSON.stringify({
           ...fields,
           address: finalAddress,
-          productSlug,
-          selectedSize,
-          quantity
+          items: cartItems.map(item => ({
+            productSlug: item.product.slug,
+            productName: item.product.name,
+            size: item.size,
+            quantity: item.quantity,
+            price: item.product.price
+          }))
         })
       });
       const data = await res.json();
@@ -120,6 +112,7 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
           qrisString: data.qrisString,
           status: "PENDING"
         });
+        clearCart(); // Clear cart after order is created successfully
       } else {
         alert("Terjadi kesalahan saat memproses pesanan.");
       }
@@ -153,11 +146,13 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
     return () => clearInterval(interval);
   }, [orderState]);
 
-  if (!productSlug || !product || !selectedSize || !product.sizes.includes(selectedSize) || !quantity) {
+  if (!mounted) return null;
+
+  if (cartItems.length === 0 && !orderState) {
     return (
       <CheckoutErrorState
-        title="Checkout Tidak Valid"
-        message="Data produk, ukuran, atau jumlah tidak valid. Silakan kembali ke katalog."
+        title="Keranjang Kosong"
+        message="Anda belum menambahkan produk apa pun ke keranjang. Silakan kembali berbelanja."
       />
     );
   }
@@ -180,10 +175,10 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
                 Terima kasih atas pesanan Anda. Kami akan segera memproses dan mengirimkan pesanan ke alamat tujuan.
               </p>
               <Link
-                href="/"
+                href="/tracking"
                 className="mt-7 inline-flex min-h-12 w-full items-center justify-center bg-burgundy px-5 text-center text-sm font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-burgundy-dark sm:w-auto sm:px-6 sm:tracking-[0.16em]"
               >
-                Kembali ke Beranda
+                Lacak Pesanan Saya
               </Link>
             </div>
           </div>
@@ -227,12 +222,12 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
               Selesaikan Pembayaran
             </h1>
             <p className="text-muted mb-8">
-              Silakan scan QRIS di bawah ini menggunakan aplikasi m-banking atau e-wallet (GoPay, OVO, Dana, dll). Nominal sudah terisi otomatis (Dinamis).
+              Silakan scan QRIS di bawah ini menggunakan aplikasi m-banking atau e-wallet (GoPay, OVO, Dana, dll).
             </p>
             <div className="bg-white p-4 border border-burgundy/15 rounded-lg inline-block shadow-sm">
               <QRCodeSVG value={orderState.qrisString} size={256} className="mx-auto" />
             </div>
-            <p className="mt-6 text-xl font-semibold text-burgundy">{formatRupiah(total)}</p>
+            <p className="mt-6 text-xl font-semibold text-burgundy">{formatRupiah(cartTotal)}</p>
             <div className="mt-8 flex items-center justify-center gap-3 text-sm text-muted">
               <svg className="animate-spin h-5 w-5 text-burgundy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -266,31 +261,29 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
 
         <form onSubmit={createOrder} className="mt-8 grid min-w-0 gap-6 lg:mt-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <aside className="min-w-0 border border-burgundy/12 bg-white p-4 sm:p-5 md:p-7 lg:sticky lg:top-28">
-            <h2 className="break-words font-serif text-3xl font-semibold leading-tight text-ink">
+            <h2 className="break-words font-serif text-3xl font-semibold leading-tight text-ink mb-6">
               Ringkasan pesanan
             </h2>
+            
+            <div className="flex flex-col gap-4 border-b border-burgundy/10 pb-6">
+              {cartItems.map((item) => (
+                <div key={item.id} className="flex gap-4">
+                  <div className="relative h-20 w-16 shrink-0 bg-offwhite">
+                    <SafeImage src={item.product.image} alt={item.product.name} fill className="object-cover" fallbackLabel={item.product.name} />
+                  </div>
+                  <div className="flex flex-1 flex-col justify-center">
+                    <h3 className="font-semibold text-sm">{item.product.name}</h3>
+                    <p className="text-xs text-muted">Size: {item.size} x {item.quantity}</p>
+                    <p className="mt-1 text-sm font-semibold text-burgundy">{formatRupiah(item.product.price * item.quantity)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <dl className="mt-6 grid gap-4 text-sm">
-              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
-                <dt className="text-muted">Nama Produk</dt>
-                <dd className="break-words text-right font-semibold text-ink">{product.name}</dd>
-              </div>
-              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
-                <dt className="text-muted">Ukuran</dt>
-                <dd className="text-right font-semibold text-ink">{selectedSize}</dd>
-              </div>
-              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
-                <dt className="text-muted">Jumlah</dt>
-                <dd className="text-right font-semibold text-ink">{quantity}</dd>
-              </div>
-              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4">
-                <dt className="text-muted">Harga Satuan</dt>
-                <dd className="text-right font-semibold text-ink">
-                  {formatRupiah(product.price)}
-                </dd>
-              </div>
-              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4 border-t border-burgundy/10 pt-4 text-base">
+              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4 text-base">
                 <dt className="font-semibold text-ink">Total</dt>
-                <dd className="text-right font-semibold text-burgundy">{formatRupiah(total)}</dd>
+                <dd className="text-right font-semibold text-burgundy">{formatRupiah(cartTotal)}</dd>
               </div>
             </dl>
           </aside>

@@ -32,41 +32,102 @@ export default async function TrackingPage() {
           <Link href="/shop" className="text-burgundy font-semibold hover:underline">Mulai belanja sekarang</Link>
         </div>
       ) : (
-        <div className="grid gap-6">
-          {orders.map((order) => (
-            <div key={order.id} className="border border-burgundy/15 bg-white p-5 sm:p-6 rounded-sm shadow-sm">
-              <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4 pb-4 border-b border-burgundy/10">
-                <div>
-                  <p className="text-xs font-semibold text-muted mb-1">Order ID</p>
-                  <p className="font-mono text-sm">{order.id}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted mb-1">Tanggal</p>
-                  <p className="text-sm">{new Date(order.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted mb-1">Status</p>
-                  <span className={`inline-flex px-2 py-1 text-xs font-bold rounded-sm ${
-                    order.status === "PAID" ? "bg-green-100 text-green-700" :
-                    order.status === "PENDING" ? "bg-yellow-100 text-yellow-700" :
-                    "bg-red-100 text-red-700"
-                  }`}>
-                    {order.status}
-                  </span>
-                </div>
-              </div>
+        <div className="grid gap-8">
+          {orders.map((order) => {
+            let items = [];
+            try {
+              items = JSON.parse(order.productSlug);
+            } catch (e) {
+              items = [{
+                name: order.productSlug.replace(/-/g, " "),
+                size: order.productSize,
+                qty: order.quantity,
+                price: order.amount / order.quantity
+              }];
+            }
 
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-semibold text-ink text-lg">{order.productSlug.replace(/-/g, " ")}</p>
-                  <p className="text-sm text-muted">Ukuran: {order.productSize} | Qty: {order.quantity}</p>
+            return (
+              <div key={order.id} className="border border-burgundy/15 bg-white shadow-sm overflow-hidden">
+                <div className="bg-cream px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-burgundy/10">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-burgundy mb-1">Order ID: {order.id}</p>
+                    <p className="text-sm font-semibold text-ink">{new Date(order.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-burgundy mb-1">Total Belanja</p>
+                    <p className="text-lg font-bold text-ink">{formatRupiah(order.amount)}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold text-burgundy text-lg">{formatRupiah(order.amount)}</p>
+
+                <div className="p-6">
+                  {/* Status Timeline */}
+                  <div className="mb-8 hidden sm:block">
+                    <div className="relative">
+                      <div className="absolute left-0 top-1/2 w-full h-1 bg-offwhite -translate-y-1/2"></div>
+                      <div className={`absolute left-0 top-1/2 h-1 transition-all -translate-y-1/2 ${
+                        order.status === "PENDING" ? "w-1/3 bg-yellow-400" :
+                        order.status === "PAID" ? "w-2/3 bg-green-500" :
+                        order.status === "SHIPPED" ? "w-full bg-green-500" :
+                        "w-full bg-red-500"
+                      }`}></div>
+                      
+                      <div className="relative flex justify-between z-10 text-xs font-semibold">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${order.status !== "FAILED" ? "bg-green-500" : "bg-red-500"}`}>1</div>
+                          <span className={order.status !== "FAILED" ? "text-green-700" : "text-red-700"}>Dipesan</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${(order.status === "PAID" || order.status === "SHIPPED") ? "bg-green-500" : order.status === "FAILED" ? "bg-red-500" : "bg-offwhite text-muted"}`}>2</div>
+                          <span className={(order.status === "PAID" || order.status === "SHIPPED") ? "text-green-700" : order.status === "FAILED" ? "text-red-700" : "text-muted"}>
+                            {order.status === "FAILED" ? "Gagal/Dibatalkan" : "Lunas"}
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${order.status === "SHIPPED" ? "bg-green-500" : "bg-offwhite text-muted"}`}>3</div>
+                          <span className={order.status === "SHIPPED" ? "text-green-700" : "text-muted"}>Dikirim</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="sm:hidden mb-6">
+                    <span className={`inline-flex px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full ${
+                      order.status === "PAID" ? "bg-green-100 text-green-700" :
+                      order.status === "PENDING" ? "bg-yellow-100 text-yellow-700" :
+                      order.status === "SHIPPED" ? "bg-green-600 text-white" :
+                      "bg-red-100 text-red-700"
+                    }`}>
+                      Status: {order.status}
+                    </span>
+                  </div>
+
+                  {/* Order Items */}
+                  <div className="grid gap-4">
+                    {items.map((item: any, idx: number) => (
+                      <div key={idx} className="flex justify-between items-center py-4 border-t border-offwhite first:border-0 first:pt-0">
+                        <div>
+                          <p className="font-semibold text-ink">{item.name}</p>
+                          <p className="text-sm text-muted mt-1">Ukuran: {item.size} | Qty: {item.qty || item.quantity}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-burgundy">{formatRupiah((item.price * (item.qty || item.quantity)) || 0)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {order.status === "PENDING" && (
+                    <div className="mt-6 pt-6 border-t border-burgundy/10 text-center">
+                      <p className="text-sm text-muted mb-3">Pesanan Anda sedang menunggu pembayaran.</p>
+                      <Link href={`/checkout?product=continue`} className="inline-block bg-burgundy text-white px-6 py-2 text-sm font-semibold uppercase tracking-widest hover:bg-burgundy-dark transition">
+                        Selesaikan Pembayaran
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
