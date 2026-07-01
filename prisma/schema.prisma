@@ -1,0 +1,26 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  customerName    String
+  customerPhone   String
+  customerAddress String?
+  customerCity    String?
+  customerPostal  String?
+  customerNotes   String?
+  productSlug     String
+  productSize     String
+  quantity        Int
+  amount          Int
+  status          String   @default("PENDING") // PENDING, PAID, CANCELLED
+  qrisString      String?  // The dynamic QRIS payload generated for this order
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

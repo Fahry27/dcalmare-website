@@ -1,13 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import QRPaymentSection from "@/components/QRPaymentSection";
 import { getProductBySlug } from "@/data/products";
 import { formatRupiah } from "@/lib/utils";
-
-const ADMIN_WHATSAPP_NUMBER = "6281234567890";
+import { QRCodeSVG } from "qrcode.react";
 
 type CheckoutFields = {
   fullName: string;
@@ -28,26 +26,13 @@ const initialFields: CheckoutFields = {
 };
 
 function parseCheckoutQuantity(value: string | null) {
-  if (!value) {
-    return null;
-  }
-
+  if (!value) return null;
   const quantity = Number(value);
-
-  if (!Number.isInteger(quantity) || quantity < 1) {
-    return null;
-  }
-
+  if (!Number.isInteger(quantity) || quantity < 1) return null;
   return quantity;
 }
 
-function CheckoutErrorState({
-  title,
-  message
-}: {
-  title: string;
-  message: string;
-}) {
+function CheckoutErrorState({ title, message }: { title: string; message: string; }) {
   return (
     <section className="bg-offwhite py-16 md:py-24">
       <div className="container-pad">
@@ -74,6 +59,8 @@ function CheckoutErrorState({
 export default function CheckoutForm() {
   const searchParams = useSearchParams();
   const [fields, setFields] = useState<CheckoutFields>(initialFields);
+  const [isLoading, setIsLoading] = useState(false);
+  const [orderState, setOrderState] = useState<{ id: string; qrisString: string; status: string } | null>(null);
 
   const productSlug = (searchParams.get("product") ?? "").trim();
   const selectedSize = (searchParams.get("size") ?? "").trim().toUpperCase();
@@ -100,87 +87,127 @@ export default function CheckoutForm() {
     }));
   }
 
-  function buildWhatsappUrl() {
-    if (!product || !quantity) {
-      return "";
+  async function createOrder(e: React.FormEvent) {
+    e.preventDefault();
+    if (!isFormComplete || !product || !quantity) return;
+    
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...fields,
+          productSlug,
+          selectedSize,
+          quantity
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.qrisString) {
+        setOrderState({
+          id: data.orderId,
+          qrisString: data.qrisString,
+          status: "PENDING"
+        });
+      } else {
+        alert("Terjadi kesalahan saat memproses pesanan.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan sistem.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // Polling for order status
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (orderState && orderState.status === "PENDING") {
+      interval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/orders/${orderState.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === "PAID") {
+              setOrderState(prev => prev ? { ...prev, status: "PAID" } : null);
+              clearInterval(interval);
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [orderState]);
+
+  if (!productSlug || !product || !selectedSize || !product.sizes.includes(selectedSize) || !quantity) {
+    return (
+      <CheckoutErrorState
+        title="Checkout Tidak Valid"
+        message="Data produk, ukuran, atau jumlah tidak valid. Silakan kembali ke katalog."
+      />
+    );
+  }
+
+  if (orderState) {
+    if (orderState.status === "PAID") {
+      return (
+        <section className="bg-offwhite py-16 md:py-24">
+          <div className="container-pad">
+            <div className="mx-auto max-w-2xl border border-burgundy/12 bg-white p-5 text-center sm:p-8">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 mb-6">
+                <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h1 className="break-words font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+                Pembayaran Berhasil!
+              </h1>
+              <p className="mt-4 text-base leading-relaxed text-muted">
+                Terima kasih atas pesanan Anda. Kami akan segera memproses dan mengirimkan pesanan ke alamat tujuan.
+              </p>
+              <Link
+                href="/"
+                className="mt-7 inline-flex min-h-12 w-full items-center justify-center bg-burgundy px-5 text-center text-sm font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-burgundy-dark sm:w-auto sm:px-6 sm:tracking-[0.16em]"
+              >
+                Kembali ke Beranda
+              </Link>
+            </div>
+          </div>
+        </section>
+      );
     }
 
-    const message = `Halo dCalmare, saya sudah melakukan pemesanan dan pembayaran melalui website.
-
-Detail Pesanan:
-Nama: ${fields.fullName}
-No. WhatsApp: ${fields.whatsapp}
-Produk: ${product.name}
-Ukuran: ${selectedSize}
-Qty: ${quantity}
-Harga Satuan: ${formatRupiah(product.price)}
-Total: ${formatRupiah(total)}
-
-Alamat Pengiriman:
-${fields.address}
-${fields.cityDistrict}
-${fields.postalCode}
-
-Catatan:
-${fields.notes || "-"}
-
-Saya akan kirim bukti pembayaran setelah pesan ini.`;
-
-    return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-  }
-
-  function confirmPayment() {
-    const whatsappUrl = buildWhatsappUrl();
-
-    if (!whatsappUrl || !isFormComplete) {
-      return;
-    }
-
-    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-  }
-
-  if (!productSlug) {
     return (
-      <CheckoutErrorState
-        title="Produk tidak ditemukan."
-        message="Tautan checkout ini tidak memiliki produk. Silakan pilih produk dari halaman katalog."
-      />
-    );
-  }
-
-  if (!product) {
-    return (
-      <CheckoutErrorState
-        title="Produk tidak ditemukan."
-        message="Produk yang dipilih tidak tersedia di katalog dCalmare."
-      />
-    );
-  }
-
-  if (!selectedSize) {
-    return (
-      <CheckoutErrorState
-        title="Ukuran belum dipilih."
-        message="Tautan checkout ini tidak memiliki ukuran. Silakan kembali ke halaman produk dan pilih ukuran."
-      />
-    );
-  }
-
-  if (!product.sizes.includes(selectedSize)) {
-    return (
-      <CheckoutErrorState
-        title="Ukuran tidak tersedia."
-        message="Ukuran yang dipilih tidak tersedia untuk produk ini."
-      />
-    );
-  }
-
-  if (!quantity) {
-    return (
-      <CheckoutErrorState
-        title="Jumlah tidak valid."
-        message="Silakan pilih jumlah minimal 1 dari halaman produk."
-      />
+      <section className="bg-offwhite py-8 md:py-16">
+        <div className="container-pad">
+          <div className="mx-auto max-w-xl border border-burgundy/12 bg-white p-6 sm:p-10 text-center">
+            <h1 className="break-words font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl mb-4">
+              Selesaikan Pembayaran
+            </h1>
+            <p className="text-muted mb-8">
+              Silakan scan QRIS di bawah ini menggunakan aplikasi m-banking atau e-wallet (GoPay, OVO, Dana, dll). Nominal sudah terisi otomatis (Dinamis).
+            </p>
+            <div className="bg-white p-4 border border-burgundy/15 rounded-lg inline-block shadow-sm">
+              <QRCodeSVG value={orderState.qrisString} size={256} className="mx-auto" />
+            </div>
+            <p className="mt-6 text-xl font-semibold text-burgundy">{formatRupiah(total)}</p>
+            <div className="mt-8 flex items-center justify-center gap-3 text-sm text-muted">
+              <svg className="animate-spin h-5 w-5 text-burgundy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Menunggu konfirmasi pembayaran...
+            </div>
+            <p className="mt-4 text-xs text-muted/80">
+              Order ID: {orderState.id}
+            </p>
+          </div>
+        </div>
+      </section>
     );
   }
 
@@ -195,11 +222,11 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
             Selesaikan pesanan.
           </h1>
           <p className="mt-5 text-base leading-relaxed text-muted md:leading-8">
-            Isi detail pengiriman, scan QR GoPay Merchant, lalu konfirmasi pesanan ke admin dCalmare melalui WhatsApp.
+            Isi detail pengiriman untuk memproses pesanan dan membuat kode QR pembayaran otomatis.
           </p>
         </div>
 
-        <div className="mt-8 grid min-w-0 gap-6 lg:mt-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+        <form onSubmit={createOrder} className="mt-8 grid min-w-0 gap-6 lg:mt-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <aside className="min-w-0 border border-burgundy/12 bg-white p-4 sm:p-5 md:p-7 lg:sticky lg:top-28">
             <h2 className="break-words font-serif text-3xl font-semibold leading-tight text-ink">
               Ringkasan pesanan
@@ -231,7 +258,7 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
           </aside>
 
           <div className="grid min-w-0 gap-6">
-            <form className="min-w-0 border border-burgundy/12 bg-white p-4 sm:p-5 md:p-7">
+            <div className="min-w-0 border border-burgundy/12 bg-white p-4 sm:p-5 md:p-7">
               <h2 className="break-words font-serif text-3xl font-semibold leading-tight text-ink">
                 Detail pengiriman
               </h2>
@@ -309,35 +336,24 @@ Saya akan kirim bukti pembayaran setelah pesan ini.`;
                   />
                 </label>
               </div>
-            </form>
-
-            <QRPaymentSection />
+            </div>
 
             <div className="grid gap-3">
-              <p className="text-center text-sm font-medium text-burgundy bg-cream border border-burgundy/15 p-3">
-                Pastikan data pesanan sudah benar sebelum melakukan pembayaran.
-              </p>
               {!isFormComplete ? (
                 <p className="text-center text-sm font-medium text-burgundy">
                   Harap lengkapi semua detail pengiriman untuk melanjutkan.
                 </p>
               ) : null}
               <button
-                type="button"
-                disabled={!isFormComplete}
-                onClick={confirmPayment}
+                type="submit"
+                disabled={!isFormComplete || isLoading}
                 className="min-h-14 w-full bg-burgundy px-4 py-3 text-center text-sm font-semibold uppercase leading-5 tracking-[0.04em] text-white transition hover:bg-burgundy-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-burgundy focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:bg-muted/35 disabled:text-white sm:px-6 sm:tracking-[0.14em]"
               >
-                Saya Sudah Bayar — Konfirmasi ke WhatsApp
+                {isLoading ? "Memproses..." : "Buat Pesanan & Bayar via QRIS"}
               </button>
             </div>
-
-            <div className="mt-6 text-center text-xs text-muted">
-              <p>Pembayaran diverifikasi manual oleh tim dCalmare.</p>
-              <p className="mt-1">Kirim bukti pembayaran setelah WhatsApp terbuka.</p>
-            </div>
           </div>
-        </div>
+        </form>
       </div>
     </section>
   );

@@ -43,7 +43,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10 py-5">
+      <div className="border-t border-white/10 pt-5 pb-12">
         <div className="container-pad text-xs text-offwhite/60">
           &copy; {new Date().getFullYear()} dCalmare. One summer can change
           everything.
