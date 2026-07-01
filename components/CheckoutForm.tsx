@@ -14,6 +14,7 @@ type CheckoutFields = {
   fullName: string;
   whatsapp: string;
   address: string;
+  manualAddress: string;
   notes: string;
 };
 
@@ -62,6 +63,7 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
     fullName: initialUser?.name || "",
     whatsapp: initialUser?.phone || "",
     address: "",
+    manualAddress: "",
     notes: ""
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -78,7 +80,8 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
       Boolean(
         fields.fullName.trim() &&
           fields.whatsapp.trim() &&
-          fields.address.trim()
+          fields.address.trim() &&
+          fields.manualAddress.trim()
       ),
     [fields]
   );
@@ -95,12 +98,15 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
     if (!isFormComplete || !product || !quantity) return;
     
     setIsLoading(true);
+    const finalAddress = `${fields.manualAddress}\n\n(Area dari Peta: ${fields.address})`;
+
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...fields,
+          address: finalAddress,
           productSlug,
           selectedSize,
           quantity
@@ -325,12 +331,23 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
                 </div>
 
                 <label className="grid gap-2 text-sm font-semibold text-ink">
-                  Alamat Lengkap (Otomatis dari Peta)
+                  Area Lokasi Peta (Otomatis dari Peta)
                   <textarea
                     value={fields.address}
                     readOnly
                     placeholder="Geser pin di peta untuk mengisi alamat..."
                     className="min-h-20 w-full resize-y border border-burgundy/15 bg-gray-100 px-4 py-3 text-base font-normal outline-none cursor-not-allowed sm:text-sm text-muted"
+                    required
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm font-semibold text-ink">
+                  Alamat Lengkap (Ketik Manual) <span className="text-burgundy">*Wajib Diisi</span>
+                  <textarea
+                    value={fields.manualAddress}
+                    onChange={(event) => updateField("manualAddress", event.target.value)}
+                    placeholder="Contoh: Jalan Kerosin 1 No. 11, RT 01 / RW 02. Patokan: Rumah pagar hitam."
+                    className="min-h-20 w-full resize-y border border-burgundy/15 bg-white px-4 py-3 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
                     required
                   />
                 </label>
