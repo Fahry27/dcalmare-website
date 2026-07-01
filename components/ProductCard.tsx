@@ -2,6 +2,7 @@ import Link from "next/link";
 import SafeImage from "@/components/SafeImage";
 import type { Product } from "@prisma/client";
 import { formatRupiah } from "@/lib/utils";
+import { getActiveProductPrice, REGULAR_PRICE } from "@/lib/pricing";
 import WishlistButton from "./WishlistButton";
 
 type ProductCardProps = {
@@ -9,6 +10,8 @@ type ProductCardProps = {
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const activePrice = getActiveProductPrice(product);
+
   return (
     <Link
       href={`/product/${product.slug}`}
@@ -51,9 +54,16 @@ export default function ProductCard({ product }: ProductCardProps) {
         <h3 className="mt-2 break-words font-serif text-lg font-semibold leading-tight text-ink sm:mt-3 sm:text-2xl">
           {product.name}
         </h3>
-        <p className="mt-2 text-sm font-semibold text-muted">
-          {formatRupiah(product.price)}
-        </p>
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <p className="text-sm font-semibold text-burgundy">
+            {formatRupiah(activePrice)}
+          </p>
+          {product.isPreOrder ? (
+            <p className="text-xs font-medium text-muted line-through">
+              {formatRupiah(REGULAR_PRICE)}
+            </p>
+          ) : null}
+        </div>
         <span className="mt-4 inline-flex min-h-10 w-full items-center justify-center border border-burgundy px-3 text-xs font-semibold uppercase tracking-[0.08em] text-burgundy transition group-hover:bg-burgundy group-hover:text-white group-focus-visible:outline-none group-focus-visible:ring-2 group-focus-visible:ring-burgundy group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-white sm:mt-6 sm:min-h-11 sm:px-5 sm:text-sm sm:tracking-[0.16em]">
           Pilih Produk
         </span>

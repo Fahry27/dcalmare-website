@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Product } from '@prisma/client';
+import { getActiveProductPrice } from '@/lib/pricing';
 
 export interface CartItem {
   id: string;
@@ -67,7 +68,7 @@ export const useCartStore = create<CartStore>()(
       },
       getTotalPrice: () => {
         return get().items.reduce(
-          (total, item) => total + item.product.price * item.quantity,
+          (total, item) => total + getActiveProductPrice(item.product) * item.quantity,
           0
         );
       },

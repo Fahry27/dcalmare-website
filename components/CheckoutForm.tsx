@@ -9,6 +9,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useCartStore } from "@/store/useCartStore";
 import SafeImage from "./SafeImage";
 import { Check, Clock3, Copy, CreditCard, ShieldCheck, Timer } from "lucide-react";
+import { getActiveProductPrice } from "@/lib/pricing";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 
@@ -470,7 +471,10 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
             </h2>
             
             <div className="flex flex-col gap-4 border-b border-burgundy/10 pb-6">
-              {cartItems.map((item) => (
+              {cartItems.map((item) => {
+                const activePrice = getActiveProductPrice(item.product);
+
+                return (
                 <div key={item.id} className="flex gap-4">
                   <div className="relative h-20 w-16 shrink-0 bg-offwhite">
                     <SafeImage src={item.product.image} alt={item.product.name} fill className="object-cover" fallbackLabel={item.product.name} />
@@ -478,10 +482,10 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
                   <div className="flex flex-1 flex-col justify-center">
                     <h3 className="font-semibold text-sm">{item.product.name}</h3>
                     <p className="text-xs text-muted">Size: {item.size} x {item.quantity}</p>
-                    <p className="mt-1 text-sm font-semibold text-burgundy">{formatRupiah(item.product.price * item.quantity)}</p>
+                    <p className="mt-1 text-sm font-semibold text-burgundy">{formatRupiah(activePrice * item.quantity)}</p>
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
 
             <dl className="mt-6 grid gap-3 text-sm border-t border-burgundy/10 pt-4">

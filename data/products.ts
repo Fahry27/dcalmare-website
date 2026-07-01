@@ -21,7 +21,7 @@ export const products: Product[] = [
     name: "500 Million Tee",
     slug: "500-million-tee",
     category: "Statement Tee",
-    price: 169000,
+    price: 218888,
     description:
       "Oversized white tee with raw handwritten back print. A bold reminder that sometimes all you need is a dream big enough to move you.",
     material: "Cotton combed",
@@ -38,7 +38,7 @@ export const products: Product[] = [
     name: "Bottle Collection Tee",
     slug: "bottle-collection-tee",
     category: "Art Graphic Tee",
-    price: 179000,
+    price: 218888,
     description:
       "An oversized white tee featuring summer-inspired bottle artwork. Clean from the front, nostalgic from the back.",
     material: "Cotton combed",
@@ -55,7 +55,7 @@ export const products: Product[] = [
     name: "Matcha Champagne Tee",
     slug: "matcha-champagne-tee",
     category: "Statement Graphic Tee",
-    price: 179000,
+    price: 218888,
     description:
       "A playful graphic tee combining champagne imagery, handwritten words, and everyday culture into one expressive back print.",
     material: "Cotton combed",

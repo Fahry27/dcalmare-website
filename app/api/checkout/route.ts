@@ -4,6 +4,7 @@ import { makeDynamicQris } from "@/lib/qris";
 import { getSession } from "@/lib/auth";
 import { publicProductWhere } from "@/lib/product-visibility";
 import { isAvailableProductSize } from "@/lib/size-chart";
+import { getActiveProductPrice } from "@/lib/pricing";
 
 const STATIC_QRIS = "00020101021126610014COM.GO-JEK.WWW01189360091439001046560210G9001046560303UMI51440014ID.CO.QRIS.WWW0215ID10264743996500303UMI5204581253033605802ID5918Brochacho Holdings6007TANGSEL61051522062070703A01630416A7";
 
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
         name: product.name,
         size: item.size,
         qty: item.quantity,
-        price: product.price
+        price: getActiveProductPrice(product)
       };
     });
 

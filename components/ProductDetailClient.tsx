@@ -10,6 +10,7 @@ import { useCartStore } from "@/store/useCartStore";
 import WishlistButton from "./WishlistButton";
 import PreOrderProgress from "./PreOrderProgress";
 import { isAvailableProductSize } from "@/lib/size-chart";
+import { getActiveProductPrice, REGULAR_PRICE } from "@/lib/pricing";
 
 type ProductDetailClientProps = {
   product: Product;
@@ -22,6 +23,8 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
   const [quantity, setQuantity] = useState(1);
   const [showSizeError, setShowSizeError] = useState(false);
   const productSizes = product.sizes.filter(isAvailableProductSize);
+  const activePrice = getActiveProductPrice(product);
+  const cartProduct = { ...product, price: activePrice };
 
   function updateQuantity(nextQuantity: number) {
     setQuantity(clampQuantity(nextQuantity));
@@ -33,7 +36,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
       return;
     }
     
-    addItem(product, selectedSize, quantity);
+    addItem(cartProduct, selectedSize, quantity);
   }
 
   return (
@@ -77,9 +80,16 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                 {product.name}
               </h1>
               <div className="mt-4 flex items-center gap-4">
-                <p className="text-xl font-semibold text-burgundy">
-                  {formatRupiah(product.price)}
-                </p>
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <p className="text-xl font-semibold text-burgundy">
+                    {formatRupiah(activePrice)}
+                  </p>
+                  {product.isPreOrder ? (
+                    <p className="text-sm font-medium text-muted line-through">
+                      {formatRupiah(REGULAR_PRICE)}
+                    </p>
+                  ) : null}
+                </div>
                 <WishlistButton 
                   product={product} 
                   className="bg-white border border-burgundy/20 rounded-full p-2.5 shadow-sm hover:border-burgundy"
@@ -89,6 +99,11 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               <p className="mt-5 text-base leading-relaxed text-muted md:mt-6 md:leading-8">
                 {product.description}
               </p>
+              {product.isPreOrder ? (
+                <p className="mt-3 inline-flex bg-cream px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-burgundy">
+                  Pre-order price. Regular price {formatRupiah(REGULAR_PRICE)}.
+                </p>
+              ) : null}
 
               {product.isPreOrder && (
                 <PreOrderProgress 
@@ -221,7 +236,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
           <div className="mx-auto flex max-w-md items-center gap-3">
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-ink">{product.name}</p>
-              <p className="text-sm font-bold text-burgundy">{formatRupiah(product.price)}</p>
+              <p className="text-sm font-bold text-burgundy">{formatRupiah(activePrice)}</p>
             </div>
             <button
               type="button"

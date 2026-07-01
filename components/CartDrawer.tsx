@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, X, Plus, Minus, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { formatRupiah } from "@/lib/utils";
+import { getActiveProductPrice } from "@/lib/pricing";
 import SafeImage from "./SafeImage";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -79,7 +80,10 @@ export default function CartDrawer() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-5">
-                  {items.map((item) => (
+                  {items.map((item) => {
+                    const activePrice = getActiveProductPrice(item.product);
+
+                    return (
                     <div key={item.id} className="flex gap-4">
                       <div className="relative aspect-[3/4] w-20 shrink-0 bg-offwhite sm:w-24">
                         <SafeImage
@@ -95,7 +99,7 @@ export default function CartDrawer() {
                           <h3 className="font-semibold text-ink">{item.product.name}</h3>
                           <p className="text-sm text-muted">Size: {item.size}</p>
                           <p className="mt-1 font-semibold text-burgundy">
-                            {formatRupiah(item.product.price)}
+                            {formatRupiah(activePrice)}
                           </p>
                         </div>
                         
@@ -132,7 +136,7 @@ export default function CartDrawer() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               )}
             </div>
