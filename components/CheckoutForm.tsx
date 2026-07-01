@@ -11,12 +11,16 @@ import SafeImage from "./SafeImage";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 
+import { POPULAR_CITIES } from "@/data/cities";
+
 type CheckoutFields = {
   fullName: string;
   whatsapp: string;
   address: string;
   manualAddress: string;
   notes: string;
+  destinationCityId: string;
+  courier: string;
 };
 
 function CheckoutErrorState({ title, message }: { title: string; message: string; }) {
@@ -59,17 +63,22 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
     whatsapp: initialUser?.phone || "",
     address: "",
     manualAddress: "",
-    notes: ""
+    notes: "",
+    destinationCityId: "",
+    courier: ""
   });
+  const [shippingCost, setShippingCost] = useState<number>(0);
+  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [orderState, setOrderState] = useState<{ id: string; qrisString: string; status: string } | null>(null);
+  const [orderState, setOrderState] = useState<{ id: string; qrisString: string; status: string; amount: number } | null>(null);
 
   const isFormComplete = useMemo(
     () =>
       Boolean(
         fields.fullName.trim() &&
           fields.whatsapp.trim() &&
-          fields.address.trim() &&
+          fields.destinationCityId &&
+          fields.courier &&
           fields.manualAddress.trim()
       ),
     [fields]
@@ -82,12 +91,47 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
     }));
   }
 
+  // Calculate shipping cost whenever city or courier changes
+  useEffect(() => {
+    async function calculateShipping() {
+      if (!fields.destinationCityId || !fields.courier) {
+        setShippingCost(0);
+        return;
+      }
+      setIsCalculatingShipping(true);
+      try {
+        const res = await fetch("/api/ongkir/cost", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            destinationCityId: fields.destinationCityId,
+            courier: fields.courier,
+            weightGrams: cartItems.reduce((total, item) => total + (item.quantity * 250), 0) || 1000
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setShippingCost(data.cost || 0);
+        } else {
+          setShippingCost(0);
+        }
+      } catch (err) {
+        console.error("Failed to calculate shipping", err);
+        setShippingCost(0);
+      } finally {
+        setIsCalculatingShipping(false);
+      }
+    }
+    calculateShipping();
+  }, [fields.destinationCityId, fields.courier, cartItems]);
+
   async function createOrder(e: React.FormEvent) {
     e.preventDefault();
     if (!isFormComplete || cartItems.length === 0) return;
     
     setIsLoading(true);
-    const finalAddress = `${fields.manualAddress}\n\n(Area dari Peta: ${fields.address})`;
+    const selectedCity = POPULAR_CITIES.find(c => c.city_id === fields.destinationCityId);
+    const finalAddress = `${fields.manualAddress}\n\nKota/Kab: ${selectedCity?.city_name || ""} (${selectedCity?.province || ""})\nKodepos: ${selectedCity?.postal_code || ""}\n\n(Peta: ${fields.address})`;
 
     try {
       const res = await fetch("/api/checkout", {
@@ -96,6 +140,7 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
         body: JSON.stringify({
           ...fields,
           address: finalAddress,
+          shippingCost,
           items: cartItems.map(item => ({
             productSlug: item.product.slug,
             productName: item.product.name,
@@ -110,7 +155,8 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
         setOrderState({
           id: data.orderId,
           qrisString: data.qrisString,
-          status: "PENDING"
+          status: "PENDING",
+          amount: data.amount
         });
         clearCart(); // Clear cart after order is created successfully
       } else {
@@ -227,7 +273,7 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
             <div className="bg-white p-4 border border-burgundy/15 rounded-lg inline-block shadow-sm">
               <QRCodeSVG value={orderState.qrisString} size={256} className="mx-auto" />
             </div>
-            <p className="mt-6 text-xl font-semibold text-burgundy">{formatRupiah(cartTotal)}</p>
+            <p className="mt-6 text-xl font-bold text-burgundy">{formatRupiah(orderState.amount)}</p>
             <div className="mt-8 flex items-center justify-center gap-3 text-sm text-muted">
               <svg className="animate-spin h-5 w-5 text-burgundy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -280,10 +326,24 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
               ))}
             </div>
 
-            <dl className="mt-6 grid gap-4 text-sm">
-              <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4 text-base">
-                <dt className="font-semibold text-ink">Total</dt>
-                <dd className="text-right font-semibold text-burgundy">{formatRupiah(cartTotal)}</dd>
+            <dl className="mt-6 grid gap-3 text-sm border-t border-burgundy/10 pt-4">
+              <div className="flex justify-between">
+                <dt className="text-muted">Subtotal Produk</dt>
+                <dd className="font-semibold text-ink">{formatRupiah(cartTotal)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-muted">Ongkos Kirim</dt>
+                <dd className="font-semibold text-ink">
+                  {isCalculatingShipping ? (
+                    <span className="text-xs text-muted animate-pulse">Menghitung...</span>
+                  ) : (
+                    formatRupiah(shippingCost)
+                  )}
+                </dd>
+              </div>
+              <div className="flex justify-between border-t border-burgundy/10 pt-3 text-base font-bold">
+                <dt className="text-ink">Total Pembayaran</dt>
+                <dd className="text-burgundy">{formatRupiah(cartTotal + shippingCost)}</dd>
               </div>
             </dl>
           </aside>
@@ -294,33 +354,68 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
                 Detail pengiriman
               </h2>
               <div className="mt-6 grid gap-5">
-                <label className="grid gap-2 text-sm font-semibold text-ink">
-                  Nama Lengkap
-                  <input
-                    type="text"
-                    value={fields.fullName}
-                    onChange={(event) => updateField("fullName", event.target.value)}
-                    placeholder="Nama sesuai identitas"
-                    className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
-                    autoComplete="name"
-                    required
-                  />
-                </label>
-                <label className="grid gap-2 text-sm font-semibold text-ink">
-                  Nomor WhatsApp
-                  <input
-                    type="tel"
-                    value={fields.whatsapp}
-                    onChange={(event) => updateField("whatsapp", event.target.value.replace(/\D/g, ''))}
-                    placeholder="Contoh: 081234567890"
-                    className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
-                    autoComplete="tel"
-                    required
-                  />
-                </label>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <label className="grid gap-2 text-sm font-semibold text-ink">
+                    Nama Lengkap
+                    <input
+                      type="text"
+                      value={fields.fullName}
+                      onChange={(event) => updateField("fullName", event.target.value)}
+                      placeholder="Nama sesuai identitas"
+                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
+                      autoComplete="name"
+                      required
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm font-semibold text-ink">
+                    Nomor WhatsApp
+                    <input
+                      type="tel"
+                      value={fields.whatsapp}
+                      onChange={(event) => updateField("whatsapp", event.target.value.replace(/\D/g, ''))}
+                      placeholder="Contoh: 081234567890"
+                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
+                      autoComplete="tel"
+                      required
+                    />
+                  </label>
+                </div>
+
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <label className="grid gap-2 text-sm font-semibold text-ink">
+                    Kota / Kabupaten Tujuan
+                    <select
+                      value={fields.destinationCityId}
+                      onChange={(e) => updateField("destinationCityId", e.target.value)}
+                      className="min-h-12 w-full border border-burgundy/15 bg-white px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
+                      required
+                    >
+                      <option value="">-- Pilih Kota / Kabupaten --</option>
+                      {POPULAR_CITIES.map((city) => (
+                        <option key={city.city_id} value={city.city_id}>
+                          {city.city_name} ({city.province})
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="grid gap-2 text-sm font-semibold text-ink">
+                    Jasa Pengiriman (Kurir)
+                    <select
+                      value={fields.courier}
+                      onChange={(e) => updateField("courier", e.target.value)}
+                      className="min-h-12 w-full border border-burgundy/15 bg-white px-4 text-base font-normal outline-none transition focus:border-burgundy sm:text-sm"
+                      required
+                    >
+                      <option value="">-- Pilih Kurir --</option>
+                      <option value="JNE">JNE (Jalur Nugraha Ekakurir)</option>
+                      <option value="POS">POS Indonesia</option>
+                      <option value="TIKI">TIKI (Titipan Kilat)</option>
+                    </select>
+                  </label>
+                </div>
                 
                 <div className="grid gap-2">
-                  <span className="text-sm font-semibold text-ink">Pilih Lokasi Pengiriman di Peta</span>
+                  <span className="text-sm font-semibold text-ink">Peta Akurasi Koordinat (Opsional)</span>
                   <MapPicker onLocationSelect={(addr) => updateField("address", addr)} />
                 </div>
 

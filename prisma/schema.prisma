@@ -41,7 +41,10 @@ model Order {
   productSize     String
   quantity        Int
   amount          Int
-  status          String   @default("PENDING") // PENDING, PAID, CANCELLED
+  shippingCost    Int      @default(0)
+  courier         String?
+  trackingNumber  String?
+  status          String   @default("PENDING") // PENDING, PAID, SHIPPED, COMPLETED, FAILED, REFUNDED
   qrisString      String?  // The dynamic QRIS payload generated for this order
   
   customerId      String?

@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { formatRupiah } from "@/lib/utils";
 import Link from "next/link";
 import LogoutButton from "./LogoutButton";
+import OrderTimeline from "@/components/OrderTimeline";
 
 export default async function TrackingPage() {
   const session = await getSession();
@@ -61,44 +62,8 @@ export default async function TrackingPage() {
 
                 <div className="p-6">
                   {/* Status Timeline */}
-                  <div className="mb-8 hidden sm:block">
-                    <div className="relative">
-                      <div className="absolute left-0 top-1/2 w-full h-1 bg-offwhite -translate-y-1/2"></div>
-                      <div className={`absolute left-0 top-1/2 h-1 transition-all -translate-y-1/2 ${
-                        order.status === "PENDING" ? "w-1/3 bg-yellow-400" :
-                        order.status === "PAID" ? "w-2/3 bg-green-500" :
-                        order.status === "SHIPPED" ? "w-full bg-green-500" :
-                        "w-full bg-red-500"
-                      }`}></div>
-                      
-                      <div className="relative flex justify-between z-10 text-xs font-semibold">
-                        <div className="flex flex-col items-center gap-2">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${order.status !== "FAILED" ? "bg-green-500" : "bg-red-500"}`}>1</div>
-                          <span className={order.status !== "FAILED" ? "text-green-700" : "text-red-700"}>Dipesan</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${(order.status === "PAID" || order.status === "SHIPPED") ? "bg-green-500" : order.status === "FAILED" ? "bg-red-500" : "bg-offwhite text-muted"}`}>2</div>
-                          <span className={(order.status === "PAID" || order.status === "SHIPPED") ? "text-green-700" : order.status === "FAILED" ? "text-red-700" : "text-muted"}>
-                            {order.status === "FAILED" ? "Gagal/Dibatalkan" : "Lunas"}
-                          </span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${order.status === "SHIPPED" ? "bg-green-500" : "bg-offwhite text-muted"}`}>3</div>
-                          <span className={order.status === "SHIPPED" ? "text-green-700" : "text-muted"}>Dikirim</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="sm:hidden mb-6">
-                    <span className={`inline-flex px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full ${
-                      order.status === "PAID" ? "bg-green-100 text-green-700" :
-                      order.status === "PENDING" ? "bg-yellow-100 text-yellow-700" :
-                      order.status === "SHIPPED" ? "bg-green-600 text-white" :
-                      "bg-red-100 text-red-700"
-                    }`}>
-                      Status: {order.status}
-                    </span>
+                  <div className="mb-8 border-b border-burgundy/10 pb-8">
+                    <OrderTimeline order={order} />
                   </div>
 
                   {/* Order Items */}

@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { formatRupiah, cn } from "@/lib/utils";
+import OrderTimeline from "@/components/OrderTimeline";
 
 export default async function ProfilePage() {
   const session = await getSession();
@@ -132,6 +133,8 @@ export default async function ProfilePage() {
                               "text-center py-2 text-xs font-bold uppercase tracking-wider w-full",
                               order.status === "PENDING" ? "bg-yellow-100 text-yellow-800" :
                               order.status === "PAID" ? "bg-green-100 text-green-800" :
+                              order.status === "SHIPPED" ? "bg-blue-100 text-blue-800" :
+                              order.status === "COMPLETED" ? "bg-teal-100 text-teal-800" :
                               "bg-red-100 text-red-800"
                             )}>
                               {order.status}
@@ -139,26 +142,10 @@ export default async function ProfilePage() {
                           </div>
                         </div>
 
-                        {order.status === "PENDING" && order.qrisString && (
-                          <div className="mt-4 pt-4 border-t border-burgundy/10 flex justify-end">
-                            <Link 
-                              href={`/tracking?id=${order.id}`}
-                              className="inline-flex h-9 items-center justify-center bg-burgundy px-4 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-burgundy-dark"
-                            >
-                              Lanjutkan Pembayaran
-                            </Link>
-                          </div>
-                        )}
-                        {order.status === "PAID" && (
-                          <div className="mt-4 pt-4 border-t border-burgundy/10 flex justify-end">
-                            <Link 
-                              href={`/tracking?id=${order.id}`}
-                              className="inline-flex h-9 items-center justify-center border border-burgundy text-burgundy px-4 text-xs font-semibold uppercase tracking-wider transition hover:bg-burgundy hover:text-white"
-                            >
-                              Lacak Pesanan (Timeline)
-                            </Link>
-                          </div>
-                        )}
+                        <div className="mt-6 pt-6 border-t border-burgundy/10">
+                          <h4 className="font-serif text-sm font-semibold text-ink mb-4">Status & Pelacakan Pengiriman</h4>
+                          <OrderTimeline order={order} />
+                        </div>
                       </div>
                     </div>
                   );

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getProductBySlug } from "@/data/products";
-import { generateDynamicQris } from "@shamah/dynamic-qris";
+import { makeDynamicQris } from "@/lib/qris";
 import { getSession } from "@/lib/auth";
 
 const STATIC_QRIS = "00020101021126610014COM.GO-JEK.WWW01189360091439001046560210G9001046560303UMI51440014ID.CO.QRIS.WWW0215ID10264743996500303UMI5204581253033605802ID5918Brochacho Holdings6007TANGSEL61051522062070703A01630416A7";
@@ -11,18 +10,24 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { 
       fullName, whatsapp, address, notes,
-      items
+      items, courier, shippingCost
     } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
-    const amount = items.reduce((total: number, item: any) => total + (item.price * item.quantity), 0);
+    const productAmount = items.reduce((total: number, item: any) => total + (item.price * item.quantity), 0);
     const totalQuantity = items.reduce((total: number, item: any) => total + item.quantity, 0);
     const session = await getSession();
 
-    // Serialize items into productSlug since we haven't migrated the schema to support OrderItems
+    const addedShipping = parseInt(shippingCost || "0", 10);
+    const totalAmount = productAmount + addedShipping;
+
+    // Generate Dynamic QRIS with exact total amount
+    const dynamicQrisString = makeDynamicQris(STATIC_QRIS, totalAmount);
+
+    // Serialize items into productSlug
     const serializedItems = JSON.stringify(items.map((i: any) => ({
       slug: i.productSlug,
       name: i.productName,
@@ -41,31 +46,19 @@ export async function POST(request: Request) {
         productSlug: serializedItems,
         productSize: "MULTIPLE",
         quantity: totalQuantity,
-        amount,
+        amount: totalAmount,
+        shippingCost: addedShipping,
+        courier: courier || null,
         customerId: session?.id || null,
         status: "PENDING",
+        qrisString: dynamicQrisString
       }
-    });
-
-    // Generate Dynamic QRIS
-    let dynamicQrisString = STATIC_QRIS;
-    try {
-      const dynamicQrisResult = generateDynamicQris(STATIC_QRIS, { amount });
-      dynamicQrisString = dynamicQrisResult.payload;
-    } catch (e) {
-      console.warn("Failed to generate dynamic QRIS, falling back to static");
-    }
-
-    // Update order with the qris string
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { qrisString: dynamicQrisString }
     });
 
     return NextResponse.json({
       orderId: order.id,
       qrisString: dynamicQrisString,
-      amount,
+      amount: totalAmount,
     });
   } catch (error) {
     console.error(error);

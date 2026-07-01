@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { Resend } from "resend";
-import { InvoiceTemplate } from "@/lib/email-templates/Invoice";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { sendInvoiceEmail } from "@/lib/email";
 
 export async function GET(
   request: Request,
@@ -25,52 +22,30 @@ export async function GET(
   }
 }
 
-// Admin can update status via PUT or PATCH
+// Admin can update status and tracking details via PATCH
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const { status } = await request.json();
+    const { status, courier, trackingNumber } = await request.json();
+
+    const updateData: any = { status };
+    if (courier !== undefined) updateData.courier = courier;
+    if (trackingNumber !== undefined) updateData.trackingNumber = trackingNumber;
 
     const order = await prisma.order.update({
       where: { id },
-      data: { status },
+      data: updateData,
       include: {
         customer: true // Include customer to get email
       }
     });
 
     // Send invoice email if status becomes PAID
-    if (status === "PAID" && order.customer?.email) {
-      // Parse serialized items
-      let items = [];
-      try {
-        items = JSON.parse(order.productSlug);
-      } catch (e) {
-        // Fallback if not using cart array format
-        items = [{
-          name: order.productSlug,
-          size: order.productSize,
-          qty: order.quantity,
-          price: order.amount / order.quantity
-        }];
-      }
-
-      await resend.emails.send({
-        from: 'dCalmare <onboarding@resend.dev>',
-        to: order.customer.email,
-        subject: `dCalmare Invoice - Pesanan Lunas #${order.id}`,
-        html: InvoiceTemplate({
-          customerName: order.customerName,
-          orderId: order.id,
-          totalAmount: order.amount,
-          date: order.createdAt.toLocaleString('id-ID'),
-          address: order.customerAddress || '-',
-          items: items
-        })
-      });
+    if (status === "PAID") {
+      await sendInvoiceEmail(order);
     }
 
     return NextResponse.json({ success: true, order });
