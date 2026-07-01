@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { signToken } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   try {
@@ -27,65 +26,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Username or Email already taken" }, { status: 400 });
     }
 
-    // Generate 6 digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Hash the password for temporary storage
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save temporary data
-    const tempData = JSON.stringify({
-      username,
-      email,
-      password: hashedPassword,
-      name,
-      phone
-    });
-
-    // Save to OtpVerification (upsert if they try to register again)
-    await prisma.otpVerification.upsert({
-      where: { email },
-      update: {
-        otp,
-        tempData,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
-      },
-      create: {
+    const customer = await prisma.customer.create({
+      data: {
+        username,
         email,
-        otp,
-        tempData,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
+        password: hashedPassword,
+        name,
+        phone
       }
     });
 
-    // Send real email via Resend
-    const { data, error } = await resend.emails.send({
-      from: "dCalmare <onboarding@resend.dev>", // Using Resend's default testing domain
-      to: [email],
-      subject: "Kode OTP Pendaftaran dCalmare Anda",
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
-          <h2 style="color: #4A0E17; text-align: center;">dCalmare</h2>
-          <p>Halo <strong>${name}</strong>,</p>
-          <p>Terima kasih telah mendaftar. Berikut adalah kode OTP Anda untuk memverifikasi email ini:</p>
-          <div style="background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 24px; letter-spacing: 5px; font-weight: bold; border-radius: 5px; margin: 20px 0;">
-            ${otp}
-          </div>
-          <p>Kode ini hanya berlaku selama <strong>5 menit</strong>.</p>
-          <p>Jika Anda tidak merasa mendaftar di dCalmare, abaikan email ini.</p>
-        </div>
-      `,
+    // Create session token
+    const token = await signToken({
+      id: customer.id,
+      username: customer.username,
+      name: customer.name,
+      phone: customer.phone
     });
 
-    if (error) {
-      console.error("Resend Error:", error);
-      return NextResponse.json({ error: "Failed to send email OTP" }, { status: 500 });
-    }
+    const cookieStore = await cookies();
+    cookieStore.set("dcalmare_session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: "/",
+    });
 
-    return NextResponse.json({ success: true, message: "OTP sent to email" });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Register Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
-
