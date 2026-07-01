@@ -22,6 +22,7 @@ const initialFields: CheckoutFields = {
   fullName: "",
   whatsapp: "",
   address: "",
+  manualAddress: "",
   notes: ""
 };
 
