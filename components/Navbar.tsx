@@ -72,7 +72,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           {user ? (
             <Link 
-              href="/tracking" 
+              href="/profile" 
               className="hidden md:inline-flex items-center justify-center min-h-10 px-4 text-sm font-semibold text-white bg-burgundy rounded-sm transition hover:bg-burgundy-dark"
             >
               Hi, {user.name.split(" ")[0]}
