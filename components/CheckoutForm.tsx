@@ -318,8 +318,8 @@ export default function CheckoutForm({ initialUser }: { initialUser?: any }) {
                   <input
                     type="tel"
                     value={fields.whatsapp}
-                    onChange={(event) => updateField("whatsapp", event.target.value)}
-                    placeholder="08..."
+                    onChange={(event) => updateField("whatsapp", event.target.value.replace(/\D/g, ''))}
+                    placeholder="Contoh: 081234567890"
                     className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
                     autoComplete="tel"
                     required

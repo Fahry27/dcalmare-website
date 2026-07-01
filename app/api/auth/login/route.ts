@@ -22,6 +22,8 @@ export async function POST(request: Request) {
     });
 
     if (!customer) {
+      // Prevent timing attacks by hashing a dummy password
+      await bcrypt.compare(password, "$2b$10$dummyhashdummyhashdummyhashdum");
       return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 

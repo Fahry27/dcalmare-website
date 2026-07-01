@@ -12,6 +12,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    if (password.length < 6) {
+      return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
+    }
+
+    if (!email.includes("@")) {
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
+    }
+
     // Check if username or email already exists
     const existingUser = await prisma.customer.findFirst({
       where: {

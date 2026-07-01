@@ -41,6 +41,7 @@ function LocationMarker({ position, setPosition, onLocationSelect }: any) {
         {
           headers: {
             "Accept-Language": "id-ID",
+            "User-Agent": "dCalmare-WebStore/1.0"
           },
         }
       );
@@ -119,7 +120,10 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
     try {
       // Fetch up to 5 results for predictions
       const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&addressdetails=1`, {
-        headers: { "Accept-Language": "id-ID" }
+        headers: {
+          'Accept-Language': 'id',
+          'User-Agent': 'dCalmare-WebStore/1.0'
+        }
       });
       const data = await res.json();
       if (data && data.length > 0) {
