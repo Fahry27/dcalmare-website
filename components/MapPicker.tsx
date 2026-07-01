@@ -92,20 +92,23 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
 
   // Try to get user's current location on mount
   useEffect(() => {
-    // Get initial location based on IP or default to Jakarta
+    handleRecenter();
+  }, []);
+
+  function handleRecenter() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setPosition(new L.LatLng(pos.coords.latitude, pos.coords.longitude));
         },
         () => {
-          setPosition(new L.LatLng(-6.2088, 106.8456)); // Jakarta
+          if (!position) setPosition(new L.LatLng(-6.2088, 106.8456)); // Jakarta
         }
       );
     } else {
-      setPosition(new L.LatLng(-6.2088, 106.8456));
+      if (!position) setPosition(new L.LatLng(-6.2088, 106.8456));
     }
-  }, []);
+  }
 
   async function handleSearch() {
     if (!searchQuery.trim()) return;
@@ -146,6 +149,19 @@ export default function MapPicker({ onLocationSelect }: MapPickerProps) {
 
   return (
     <div className="relative h-[400px] w-full border border-burgundy/15 z-0 flex flex-col">
+      {/* Recenter Button */}
+      <button
+        type="button"
+        onClick={handleRecenter}
+        title="Lokasi Saya"
+        className="absolute bottom-6 right-2 z-[400] bg-white border border-burgundy/20 rounded-sm shadow-sm w-9 h-9 flex items-center justify-center text-burgundy hover:bg-offwhite transition"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+        </svg>
+      </button>
+
       <div className="absolute top-2 left-2 right-2 z-[400]">
         <div className="flex gap-2">
           <input 
