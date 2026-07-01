@@ -130,8 +130,8 @@ export default function CheckoutForm() {
           const res = await fetch(`/api/orders/${orderState.id}`);
           if (res.ok) {
             const data = await res.json();
-            if (data.status === "PAID") {
-              setOrderState(prev => prev ? { ...prev, status: "PAID" } : null);
+            if (data.status !== "PENDING") {
+              setOrderState(prev => prev ? { ...prev, status: data.status } : null);
               clearInterval(interval);
             }
           }
@@ -174,6 +174,34 @@ export default function CheckoutForm() {
                 className="mt-7 inline-flex min-h-12 w-full items-center justify-center bg-burgundy px-5 text-center text-sm font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-burgundy-dark sm:w-auto sm:px-6 sm:tracking-[0.16em]"
               >
                 Kembali ke Beranda
+              </Link>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    if (orderState.status === "FAILED" || orderState.status === "REFUNDED") {
+      return (
+        <section className="bg-offwhite py-16 md:py-24">
+          <div className="container-pad">
+            <div className="mx-auto max-w-2xl border border-burgundy/12 bg-white p-5 text-center sm:p-8">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600 mb-6">
+                <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <h1 className="break-words font-serif text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+                Pembayaran {orderState.status === "FAILED" ? "Gagal" : "Di-Refund"}
+              </h1>
+              <p className="mt-4 text-base leading-relaxed text-muted">
+                Pesanan Anda telah dibatalkan oleh Admin. Silakan hubungi kami jika Anda memiliki pertanyaan atau kendala.
+              </p>
+              <Link
+                href="/shop"
+                className="mt-7 inline-flex min-h-12 w-full items-center justify-center bg-burgundy px-5 text-center text-sm font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-burgundy-dark sm:w-auto sm:px-6 sm:tracking-[0.16em]"
+              >
+                Kembali ke Katalog
               </Link>
             </div>
           </div>

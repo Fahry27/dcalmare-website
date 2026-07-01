@@ -56,15 +56,14 @@ export default async function AdminDashboard() {
                     <span className={`px-2 py-1 text-xs font-semibold rounded ${
                       order.status === "PAID" ? "bg-green-100 text-green-700" : 
                       order.status === "PENDING" ? "bg-yellow-100 text-yellow-700" : 
+                      order.status === "REFUNDED" ? "bg-gray-100 text-gray-700" :
                       "bg-red-100 text-red-700"
                     }`}>
                       {order.status}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    {order.status === "PENDING" && (
-                      <OrderActions orderId={order.id} />
-                    )}
+                    <OrderActions orderId={order.id} currentStatus={order.status} />
                   </td>
                 </tr>
               ))}
