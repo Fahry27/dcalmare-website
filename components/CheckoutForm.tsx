@@ -3,16 +3,17 @@
 import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { getProductBySlug } from "@/data/products";
 import { formatRupiah } from "@/lib/utils";
 import { QRCodeSVG } from "qrcode.react";
+
+const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 
 type CheckoutFields = {
   fullName: string;
   whatsapp: string;
   address: string;
-  cityDistrict: string;
-  postalCode: string;
   notes: string;
 };
 
@@ -20,8 +21,6 @@ const initialFields: CheckoutFields = {
   fullName: "",
   whatsapp: "",
   address: "",
-  cityDistrict: "",
-  postalCode: "",
   notes: ""
 };
 
@@ -73,9 +72,7 @@ export default function CheckoutForm() {
       Boolean(
         fields.fullName.trim() &&
           fields.whatsapp.trim() &&
-          fields.address.trim() &&
-          fields.cityDistrict.trim() &&
-          fields.postalCode.trim()
+          fields.address.trim()
       ),
     [fields]
   );
@@ -315,52 +312,31 @@ export default function CheckoutForm() {
                     required
                   />
                 </label>
+                
+                <div className="grid gap-2">
+                  <span className="text-sm font-semibold text-ink">Pilih Lokasi Pengiriman di Peta</span>
+                  <MapPicker onLocationSelect={(addr) => updateField("address", addr)} />
+                </div>
+
                 <label className="grid gap-2 text-sm font-semibold text-ink">
-                  Alamat Lengkap
+                  Alamat Lengkap (Otomatis dari Peta)
                   <textarea
                     value={fields.address}
-                    onChange={(event) => updateField("address", event.target.value)}
-                    placeholder="Nama jalan, gedung, RT/RW, nomor rumah, patokan"
-                    className="min-h-28 w-full resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
+                    readOnly
+                    placeholder="Geser pin di peta untuk mengisi alamat..."
+                    className="min-h-20 w-full resize-y border border-burgundy/15 bg-gray-100 px-4 py-3 text-base font-normal outline-none cursor-not-allowed sm:text-sm text-muted"
                     required
                   />
                 </label>
-                <div className="grid gap-5 md:grid-cols-2">
-                  <label className="grid gap-2 text-sm font-semibold text-ink">
-                    Kecamatan / Kota
-                    <input
-                      type="text"
-                      value={fields.cityDistrict}
-                      onChange={(event) =>
-                        updateField("cityDistrict", event.target.value)
-                      }
-                      placeholder="Kecamatan, Kota"
-                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
-                      required
-                    />
-                  </label>
-                  <label className="grid gap-2 text-sm font-semibold text-ink">
-                    Kode Pos
-                    <input
-                      type="text"
-                      value={fields.postalCode}
-                      onChange={(event) =>
-                        updateField("postalCode", event.target.value)
-                      }
-                      placeholder="Kodepos"
-                      className="min-h-12 w-full border border-burgundy/15 bg-offwhite px-4 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
-                      autoComplete="postal-code"
-                      required
-                    />
-                  </label>
-                </div>
+                
                 <label className="grid gap-2 text-sm font-semibold text-ink">
-                  Catatan Pesanan (Opsional)
+                  Catatan Patokan (Wajib diisi)
                   <textarea
                     value={fields.notes}
                     onChange={(event) => updateField("notes", event.target.value)}
-                    placeholder="Titip pesan untuk admin (opsional)"
+                    placeholder="Contoh: Rumah pagar hitam depan masjid, atas nama Budi"
                     className="min-h-24 w-full resize-y border border-burgundy/15 bg-offwhite px-4 py-3 text-base font-normal outline-none transition focus:border-burgundy placeholder:text-muted/60 sm:text-sm"
+                    required
                   />
                 </label>
               </div>

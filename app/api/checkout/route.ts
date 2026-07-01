@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { 
-      fullName, whatsapp, address, cityDistrict, postalCode, notes,
+      fullName, whatsapp, address, notes,
       productSlug, selectedSize, quantity
     } = body;
 
@@ -24,8 +24,6 @@ export async function POST(request: Request) {
         customerName: fullName,
         customerPhone: whatsapp,
         customerAddress: address,
-        customerCity: cityDistrict,
-        customerPostal: postalCode,
         customerNotes: notes,
         productSlug,
         productSize: selectedSize,
