@@ -10,7 +10,7 @@ export default function FAQSection({ limit, showLink = false }: FAQSectionProps)
   const visibleFaqs = typeof limit === "number" ? faqs.slice(0, limit) : faqs;
 
   return (
-    <section className="bg-offwhite py-12 md:py-24">
+    <section className="bg-offwhite py-12 md:py-24 w-full overflow-hidden">
       <div className="container-pad">
         <div className="flex min-w-0 flex-col justify-between gap-5 md:flex-row md:items-end">
           <div className="min-w-0">

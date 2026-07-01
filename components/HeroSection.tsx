@@ -4,7 +4,7 @@ import SafeImage from "@/components/SafeImage";
 export default function HeroSection() {
   return (
     <section
-      className="bg-burgundy bg-cover bg-center text-offwhite"
+      className="bg-burgundy bg-cover bg-center text-offwhite w-full overflow-hidden"
       style={{ backgroundImage: "url('/brand/burgundy-texture.jpg')" }}
     >
       <div className="container-pad grid min-h-[calc(100svh-4rem)] items-center gap-8 py-12 md:min-h-[calc(100svh-5rem)] md:grid-cols-[1.15fr_0.85fr] md:gap-10 md:py-20">
